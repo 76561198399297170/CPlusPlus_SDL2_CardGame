@@ -1,0 +1,23 @@
+.vs/
+*.suo
+*.user
+*.ipch
+*.VC.db
+*.VC.opendb
+x64/
+Debug/
+Release/
+
+# 动态链接库
+*.dll
+*.lib
+
+# 临时文件
+*.tmp
+*.log
+
+# 其他IDE配置
+.idea/
+.vscode/
+*.sdf
+*.opensdf
