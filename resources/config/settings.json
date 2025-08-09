@@ -1,0 +1,29 @@
+{
+  "_comment": "游戏核心配置参数，基于设计文稿设定",
+  "window": {
+    "_comment": "SDL2窗口属性",
+    "width": 1280,
+    "height": 720,
+    "title": "Rogue Farm",
+    "fullscreen": false
+  },
+  "audio": {
+    "_comment": "SDL2_mixer音频设置",
+    "music_volume": 70,
+    "sfx_volume": 80
+  },
+  "gameplay": {
+    "_comment": "基础玩法参数",
+    "starting_health": 65,
+    "max_health": 65,
+    "starting_action_points": 3,
+    "max_hand_size": 15,
+    "starting_hand_count": 5,
+    "draw_per_turn": 3
+  },
+  "sdl": {
+    "_comment": "SDL渲染配置",
+    "framerate": 60,
+    "render_scale_quality": "linear"
+  }
+}

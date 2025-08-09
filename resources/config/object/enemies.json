@@ -1,0 +1,76 @@
+{
+  "_comment": "敌人属性与行为",
+  "enemies": [
+    {
+      "_comment": "树木：白天+4防御，掉落木头、树枝",
+      "id": "tree",
+      "name": "Tree",
+      "health_range": [10, 18],
+      "defense_bonus": {
+        "condition": "time_is_day",
+        "value": 4
+      },
+      "tags": ["think", "taunt", "attack(1-2)"],
+      "drops": [
+        {"item": "wood", "quantity_range": [1, 3]},
+        {"item": "stick", "quantity_range": [1, 3]}
+      ]
+    },
+    {
+      "_comment": "干草簇：夜晚+4防御，掉落干草、草绳",
+      "id": "hay_cluster",
+      "name": "Hay Cluster",
+      "health_range": [8, 8],
+      "defense_bonus": {
+        "condition": "time_is_night",
+        "value": 4
+      },
+      "tags": ["think"],
+      "drops": [
+        {"item": "hay", "quantity_range": [4, 5]},
+        {"item": "hay_rope", "quantity_range": [0, 1]}
+      ]
+    },
+    {
+      "_comment": "石块：夜晚+4防御，掉落石头",
+      "id": "stone_pile",
+      "name": "Stone Pile",
+      "health_range": [10, 15],
+      "defense_bonus": {
+        "condition": "time_is_night",
+        "value": 4
+      },
+      "tags": ["think", "taunt"],
+      "drops": [{"item": "stone", "quantity_range": [3, 5]}]
+    },
+    {
+      "_comment": "野兔：多种行为标签，掉落干草",
+      "id": "rabbit",
+      "name": "Wild Rabbit",
+      "health_range": [10, 20],
+      "tags": ["think", "attack(8-12)", "ram(1)", "defense(2-6)", "flee"],
+      "drops": [{"item": "hay", "quantity_range": [0, 1]}]
+    },
+    {
+      "_comment": "蝙蝠：被攻击3次进入思考，掉落干草",
+      "id": "bat",
+      "name": "Bat",
+      "health_range": [12, 16],
+      "special_trigger": "Enters think state if attacked 3 times in one turn",
+      "tags": ["think", "attack(6-16)", "defense(2-4)", "flee"],
+      "drops": [{"item": "hay", "quantity_range": [0, 1]}]
+    },
+    {
+      "_comment": "野猪：受重创进入警戒，多行为标签",
+      "id": "wild_boar",
+      "name": "Wild Boar",
+      "health_range": [20, 32],
+      "special_trigger": "Enters alert if single-turn damage exceeds 30% max health",
+      "tags": ["think", "attack(8-18)", "ram(1-3)", "defense(8-12)", "taunt", "anger", "alert", "flee"],
+      "drops": [
+        {"item": "hay", "quantity_range": [2, 3]},
+        {"item": "stone", "quantity_range": [0, 2]}
+      ]
+    }
+  ]
+}
