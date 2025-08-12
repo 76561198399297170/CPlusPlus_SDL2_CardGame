@@ -1,0 +1,41 @@
+#include "sceneManager.h"
+
+extern GameScene* game_scene;
+extern MenuScene* menu_scene;
+extern MapScene* map_scene;
+
+void SceneManager::switchTo(SceneType switch_to, bool is_exit)
+{
+	if (is_exit) this->m_scene->exit();
+
+	switch (switch_to)
+	{
+	case SceneType::Menu:
+		this->m_scene = menu_scene->getInstance();
+		break;
+	case SceneType::Map:
+		this->m_scene = map_scene->getInstance();
+		break;
+	case SceneType::Game:
+		this->m_scene = game_scene->getInstance();
+		break;
+	default:
+		break;
+	}
+	this->m_scene->enter();
+}
+
+void SceneManager::update(float delta)
+{
+	this->m_scene->update(delta);
+}
+
+void SceneManager::render(SDL_Renderer* renderer, const Camera* camera)
+{
+	this->m_scene->render(camera);
+}
+
+void SceneManager::input(SDL_Event& event)
+{
+	this->m_scene->input(event);
+}
