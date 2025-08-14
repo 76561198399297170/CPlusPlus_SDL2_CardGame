@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\card">
-      <UniqueIdentifier>{431b8a1b-d41d-4a5f-81f8-9ee86a298cb6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Animation">
       <UniqueIdentifier>{a4b4f363-c76a-4857-8ac7-d722897e6c4f}</UniqueIdentifier>
     </Filter>
@@ -78,14 +75,17 @@
     <ClCompile Include="menuTable.cpp">
       <Filter>源文件\source</Filter>
     </ClCompile>
-    <ClCompile Include="musicTable.cpp">
+    <ClCompile Include="volumeTable.cpp">
+      <Filter>源文件\source</Filter>
+    </ClCompile>
+    <ClCompile Include="videoTable.cpp">
+      <Filter>源文件\source</Filter>
+    </ClCompile>
+    <ClCompile Include="controlsTable.cpp">
       <Filter>源文件\source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cardEnum.h">
-      <Filter>头文件\card</Filter>
-    </ClInclude>
     <ClInclude Include="animation.h">
       <Filter>头文件\Animation</Filter>
     </ClInclude>
@@ -134,7 +134,13 @@
     <ClInclude Include="myTable.h">
       <Filter>头文件\table</Filter>
     </ClInclude>
-    <ClInclude Include="musicTable.h">
+    <ClInclude Include="volumeTable.h">
+      <Filter>头文件\table</Filter>
+    </ClInclude>
+    <ClInclude Include="controlsTable.h">
+      <Filter>头文件\table</Filter>
+    </ClInclude>
+    <ClInclude Include="videoTable.h">
       <Filter>头文件\table</Filter>
     </ClInclude>
   </ItemGroup>

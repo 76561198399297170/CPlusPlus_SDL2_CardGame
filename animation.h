@@ -87,6 +87,8 @@ private:
     void triggerCallbacks();
 
 public:
+    bool is_show = true;
+
     SDL_FRect m_dst_rect;
     Vector2 m_scale = { 1.0f, 1.0f }; // 缩放比例
     SDL_FPoint m_origin = { 0.0f, 0.0f };// 动画原点（相对于帧左上角）

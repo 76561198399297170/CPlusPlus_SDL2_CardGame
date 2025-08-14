@@ -43,7 +43,7 @@ void Animation::update(float delta)
 
 void Animation::render(const Camera* camera, const Vector2 base, SDL_RendererFlip flip) const
 {
-    if (this->m_frames.empty() || this->m_stopped) return;
+    if (this->m_frames.empty() || this->m_stopped || !this->is_show) return;
 
     const Vector2 frame_size = { (float)this->m_dst_rect.w, (float)this->m_dst_rect.h };
     const Vector2 scaled_size = { frame_size.m_x * this->m_scale.m_x, frame_size.m_y * this->m_scale.m_y };

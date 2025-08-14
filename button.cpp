@@ -4,8 +4,13 @@
 #include "sceneManager.h"
 #include "utils.h"
 
-extern int volume_percentage;
+extern SDL_Window* window;
+extern Camera* main_camera;
+
 extern bool is_quit;
+extern bool is_full_screen;
+extern bool is_vsync;
+extern bool is_shake;
 
 Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_streaming)
 {
@@ -16,7 +21,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("menu_start_n", false), nullptr, nullptr, &w, &h);
 		w /= n;
 
-		button->m_angle = 0.0f;
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h};
 		button->m_rect_src = { 0, 0, w, h };
@@ -43,8 +47,8 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			{
 				button->m_tex_keydown->reset();
 				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
-				SceneManager::getInstance()->switchTo(SceneManager::SceneType::Game);
-				button->m_tex_normal->play();
+				SceneManager::getInstance()->switchTo(SceneManager::SceneType::Game, 3000);
+				button->m_tex_float->play();
 			});
 		button->m_tex_normal->play();
 	}
@@ -54,7 +58,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("menu_setting_n", false), nullptr, nullptr, &w, &h);
 		w /= n;
 
-		button->m_angle = 0.0f;
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
@@ -92,7 +95,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("menu_exit_n", false), nullptr, nullptr, &w, &h);
 		w /= n;
 
-		button->m_angle = 0.0f;
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
@@ -130,7 +132,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("exit_n", false), nullptr, nullptr, &w, &h);
 		w /= n;
 
-		button->m_angle = 0.0f;
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
@@ -160,18 +161,17 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			});
 		button->m_tex_normal->play();
 	}
-	else if (button_type == "Menu_Setting_Music")
+	else if (button_type == "Menu_Setting_Volume")
 	{
 		int w, h, n = 3;
-		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("width_music_n", false), nullptr, nullptr, &w, &h);
+		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("width_volume_n", false), nullptr, nullptr, &w, &h);
 		w /= n;
 
-		button->m_angle = 0.0f;
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
 
-		button->setTextureSheet("width_music_n", "width_music_f", "width_music_k", 3, 3, 3, 60, 60, 60);
+		button->setTextureSheet("width_volume_n", "width_volume_f", "width_volume_k", 3, 3, 3, 60, 60, 60);
 		button->setOnFloatFunction([button]()
 			{
 				button->m_tex_normal->reset();
@@ -195,18 +195,90 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 				button->m_tex_normal->play();
 			});
 		button->m_tex_normal->play();
-	}
-	else if (button_type == "Menu_Setting_Music_Volume")
+		}
+	else if (button_type == "Menu_Setting_Video")
+	{
+		int w, h, n = 3;
+		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("width_video_n", false), nullptr, nullptr, &w, &h);
+		w /= n;
+
+		button->m_rect_center = { w / 2.0f, h / 2.0f };
+		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
+		button->m_rect_src = { 0, 0, w, h };
+
+		button->setTextureSheet("width_video_n", "width_video_f", "width_video_k", 3, 3, 3, 60, 60, 60);
+		button->setOnFloatFunction([button]()
+			{
+				button->m_tex_normal->reset();
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("yee"), 0);
+				button->m_tex_float->play();
+			});
+		button->setOutFloatFunction([button]()
+			{
+				button->m_tex_float->reset();
+				button->m_tex_normal->play();
+			});
+		button->setOnKeydownFunction([button]()
+			{
+				button->m_tex_float->reset();
+				button->m_tex_keydown->play();
+			});
+		button->setOnKeyupFunction([button]()
+			{
+				button->m_tex_keydown->reset();
+				button->m_type = Button::ButtonType::Normal;
+				button->m_tex_normal->play();
+			});
+		button->m_tex_normal->play();
+		}
+	else if (button_type == "Menu_Setting_Controls")
+	{
+		int w, h, n = 3;
+		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("width_controls_n", false), nullptr, nullptr, &w, &h);
+		w /= n;
+
+		button->m_rect_center = { w / 2.0f, h / 2.0f };
+		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
+		button->m_rect_src = { 0, 0, w, h };
+
+		button->setTextureSheet("width_controls_n", "width_controls_f", "width_controls_k", 3, 3, 3, 60, 60, 60);
+		button->setOnFloatFunction([button]()
+			{
+				button->m_tex_normal->reset();
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("yee"), 0);
+				button->m_tex_float->play();
+			});
+		button->setOutFloatFunction([button]()
+			{
+				button->m_tex_float->reset();
+				button->m_tex_normal->play();
+			});
+		button->setOnKeydownFunction([button]()
+			{
+				button->m_tex_float->reset();
+				button->m_tex_keydown->play();
+			});
+		button->setOnKeyupFunction([button]()
+			{
+				button->m_tex_keydown->reset();
+				button->m_type = Button::ButtonType::Normal;
+				button->m_tex_normal->play();
+			});
+		button->m_tex_normal->play();
+		}
+	else if (button_type == "Menu_Setting_Volume_Music")
 	{
 		int w, h;
 		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("slide_switch_n", false), nullptr, nullptr, &w, &h);
 
-		button->m_angle = 0.0f;
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
-		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
+		int volume = Mix_Volume(-1, -1) * 4;
+
+		button->m_rect_dst = { (float)x + volume, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
-		button->m_flag = { (float)x, (float)y };
-		button->m_flag_nmv = { (float)512, (float)0 };
+		button->m_flag = { (float)x + volume, (float)y };
+		button->m_flag_nmv = { 0.0f + volume, 0.0f };
+		button->m_flag_pmv = { 512.0f - volume, 0.0f };
 
 		button->setTextureSheet("slide_switch_n", "slide_switch_f", "slide_switch_k", 1, 1, 1, 1, 1, 1);
 		button->setOnFloatFunction([button]()
@@ -222,8 +294,8 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		button->addOnMoveFunction([cur_mgr, button]()
 			{
 				int move_x = cur_mgr->getPosCurr().x - button->getCurrentAnimation()->getCurrRect().w / 2;
-				button->m_move_base.m_x = std::min((int)button->m_flag.m_x, (int)move_x);
-				button->m_move_base.m_x = std::max((int)(button->m_flag.m_x - button->m_flag_nmv.m_x), (int)button->m_move_base.m_x);
+				button->m_move_base.m_x = std::max((int)(button->m_flag.m_x - button->m_flag_nmv.m_x), (int)move_x);
+				button->m_move_base.m_x = std::min((int)(button->m_flag.m_x + button->m_flag_pmv.m_x), (int)button->m_move_base.m_x);
 				button->m_move_base.m_x -= button->getPosition().m_x;
 
 				Vector2 pos = button->getPosition() + button->m_move_base;
@@ -233,6 +305,82 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 				setAllChannelsVolume(button->m_rect_dst.x - (button->m_flag.m_x - button->m_flag_nmv.m_x), 4);
 			});
 		button->m_tex_normal->play();
+	}
+	else if (button_type == "Full_Screen_Check_Box")
+	{
+		int w, h, n = 3;
+		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("check_box_t", false), nullptr, nullptr, &w, &h);
+		w /= n;
+
+		button->m_rect_center = { w / 2.0f, h / 2.0f };
+		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
+		button->m_rect_src = { 0, 0, w, h };
+		button->is_show = is_full_screen;
+
+		button->setTextureSheet("check_box_t", "check_box_t", "check_box_t", 3, 3, 3, 60, 60, 60);
+		button->setOnFloatFunction([button]()
+			{
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("yee"), 0);
+			});
+		button->setOnKeyupFunction([button]()
+			{
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
+				is_full_screen = !is_full_screen;
+				setFullScreen(window, is_full_screen);
+				button->is_show = !button->is_show;
+			});
+		button->m_tex_normal->play();
+		button->m_tex_float->play();
+	}
+	else if (button_type == "Set_Vsync_Check_Box")
+	{
+		int w, h, n = 3;
+		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("check_box_t", false), nullptr, nullptr, &w, &h);
+		w /= n;
+
+		button->m_rect_center = { w / 2.0f, h / 2.0f };
+		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
+		button->m_rect_src = { 0, 0, w, h };
+		button->is_show = is_vsync;
+
+		button->setTextureSheet("check_box_t", "check_box_t", "check_box_t", 3, 3, 3, 60, 60, 60);
+		button->setOnFloatFunction([button]()
+			{
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("yee"), 0);
+			});
+		button->setOnKeyupFunction([button]()
+			{
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
+				is_vsync = !is_vsync;
+				button->is_show = !button->is_show;
+			});
+		button->m_tex_normal->play();
+		button->m_tex_float->play();
+	}
+	else if (button_type == "Set_Shake_Check_Box")
+	{
+		int w, h, n = 3;
+		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("check_box_t", false), nullptr, nullptr, &w, &h);
+		w /= n;
+
+		button->m_rect_center = { w / 2.0f, h / 2.0f };
+		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
+		button->m_rect_src = { 0, 0, w, h };
+		button->is_show = is_shake;
+
+		button->setTextureSheet("check_box_t", "check_box_t", "check_box_t", 3, 3, 3, 60, 60, 60);
+		button->setOnFloatFunction([button]()
+			{
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("yee"), 0);
+			});
+		button->setOnKeyupFunction([button]()
+			{
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
+				is_shake = !is_shake;
+				button->is_show = !button->is_show;
+			});
+		button->m_tex_normal->play();
+		button->m_tex_float->play();
 	}
 
     return button;
@@ -256,6 +404,7 @@ Button::~Button()
 
 void Button::render(SDL_Renderer* renderer, SDL_RendererFlip flip) const
 {
+	if (!this->is_show) return;
 	const SDL_Rect& rt = this->getCurrentAnimation()->getCurrRect();
 	SDL_FRect dt = this->m_rect_dst;
 	dt.x += this->m_move_base.m_x, dt.y += this->m_move_base.m_y;

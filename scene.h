@@ -24,7 +24,8 @@ public:
 	virtual void update(float delta) {}
 	virtual void input(SDL_Event& event) {}
 
-private:
+protected:
+	bool is_input = true;
 
 };
 

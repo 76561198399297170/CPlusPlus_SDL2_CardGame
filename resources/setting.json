@@ -1,0 +1,17 @@
+{
+	"controls" : 
+	{
+		"vibration" : true
+	},
+	"video" : 
+	{
+		"fullscreen" : false,
+		"height" : 720,
+		"vsync" : false,
+		"width" : 1280
+	},
+	"volume" : 
+	{
+		"music" : 20
+	}
+}

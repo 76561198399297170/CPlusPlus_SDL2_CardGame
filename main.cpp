@@ -1,14 +1,14 @@
 ﻿#define SDL_MAIN_HANDLED
 
 #include <SDL.h>
-#include <SDL_ttf.h>
+//#include <SDL_ttf.h>
 #include <SDL_mixer.h>
 #include <SDL_image.h>
 #include <SDL2_gfxPrimitives.h>
 #include <json/json.h>
 
 #include <fstream>
-#include <Windows.h>
+#include <windows.h>
 
 #include "button.h"
 
@@ -18,15 +18,18 @@
 
 #include "camera.h"
 #include "utils.h"
-
+#include <iostream>
 
 #define u8(x) u8##x
 
 
 bool is_quit = false;
-int fps = 60;
+bool is_shake = true;
+bool is_full_screen = false;
+bool is_vsync = true;
 
-int volume_percentage = 80;
+int fps = 60;
+int font_size = 24;
 
 int window_width = 1280;
 int window_height = 720;
@@ -46,13 +49,30 @@ SceneManager* scn_mgr = nullptr;
 
 ButtonFactory* button_factory;
 
-void load_resources()
+bool load_resources()
 {
-    menu_scene = MenuScene::getInstance();
-    map_scene = MapScene::getInstance();
-    game_scene = GameScene::getInstance();
+    std::ifstream file("./resources/setting.json");
+    Json::CharReaderBuilder reader;
+    Json::Value root;
+    std::string errors;
+    bool parseSuccess = Json::parseFromStream(reader, file, &root, &errors);
+    if (!parseSuccess) return true;
 
-    scn_mgr->getInstance()->switchTo(SceneManager::SceneType::Menu, false);
+    window_width = root["video"]["width"].asInt();
+    window_height = root["video"]["height"].asInt();
+
+    is_shake = root["controls"]["vibration"].asBool();
+    setAllChannelsVolume(root["volume"]["music"].asInt());
+
+    is_vsync = root["video"]["vsync"].asBool();
+
+    if (root["video"]["fullscreen"].asBool())
+    {
+        is_full_screen = true;
+        setFullScreen(window, true);
+    }
+
+    return false;
 }
 
 void delete_resources()
@@ -60,7 +80,7 @@ void delete_resources()
     delete button_factory;
 }
 
-void init()
+bool init()
 {
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
@@ -76,20 +96,34 @@ void init()
     Mix_AllocateChannels(32);
 
     window = SDL_CreateWindow(u8("你好，世界"), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    if (load_resources()) return true;
+
+    SDL_RendererInfo info;
+    SDL_GetRendererInfo(renderer, &info);
+    Uint32 flag = info.flags;
+    if (is_vsync) flag |= SDL_RENDERER_PRESENTVSYNC;
+    else flag &= ~SDL_RENDERER_PRESENTVSYNC;
+    renderer = SDL_CreateRenderer(window, -1, flag);
 
     SDL_ShowCursor(SDL_DISABLE);
-
-    main_camera = new Camera(renderer);
     
     res_mgr = ResourcesManager::getInstance();
     res_mgr->getInstance()->loadResources(renderer);
-    cur_mgr = CursorManager::getInstance();
-    scn_mgr = SceneManager::getInstance();
 
+    menu_scene = MenuScene::getInstance();
+    map_scene = MapScene::getInstance();
+    game_scene = GameScene::getInstance();
+
+    main_camera = new Camera(renderer);
     button_factory = new ButtonFactory();
 
-    load_resources();
+    cur_mgr = CursorManager::getInstance();
+
+    scn_mgr = SceneManager::getInstance();
+    scn_mgr->getInstance()->setScene(menu_scene);
+
+    return false;
 }
 
 void deinit()
@@ -107,11 +141,12 @@ void deinit()
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();
+
 }
 
 void mainloop()
 {
-    bool quit_loop = false;
+    bool main_loop = false;
 
     Uint64 last_counter = SDL_GetPerformanceCounter();
     Uint64 counter_freq = SDL_GetPerformanceFrequency();
@@ -119,13 +154,14 @@ void mainloop()
     SDL_Event event;
     
     Timer quit_timer;
-    quit_timer.setDuration(2250);
-    quit_timer.setCallback([&quit_loop]()
+    quit_timer.setDuration(/*2250*/0);
+    quit_timer.setAutoRestart(true);
+    quit_timer.setCallback([&main_loop]()
         {
-            quit_loop = true;
+            main_loop = true;
         });
 
-    while (!quit_loop)
+    while (!main_loop)
     {
         //事件处理
         while (SDL_PollEvent(&event))
@@ -136,7 +172,7 @@ void mainloop()
             }
             else if (event.type == SDL_KEYDOWN)
             {
-                if (event.key.keysym.sym == SDLK_SPACE) scn_mgr->switchTo(SceneManager::SceneType::Menu);
+                if (event.key.keysym.sym == SDLK_SPACE) main_camera->turnLight(3000);
             }
 
             cur_mgr->getInstance()->input(event);
@@ -162,6 +198,7 @@ void mainloop()
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
         scn_mgr->getInstance()->render(renderer, main_camera);
+        main_camera->render();
         cur_mgr->getInstance()->render(renderer);
 
         SDL_RenderPresent(renderer);
@@ -175,10 +212,57 @@ void mainloop()
     }
 }
 
+void saveSetting()
+{
+    Json::Value root;
+
+    // 音量设置
+    Json::Value volumeSettings;
+    volumeSettings["music"] = Mix_Volume(-1, -1);   //音量大小
+    root["volume"] = volumeSettings;
+
+    // 视频设置
+    Json::Value videoSettings;
+    videoSettings["width"] = window_width;          //分辨率
+    videoSettings["height"] = window_height;        //分辨率
+    videoSettings["fullscreen"] = is_full_screen;   //是否全屏
+    videoSettings["vsync"] = is_vsync;              //垂直同步
+    root["video"] = videoSettings;
+
+    // 控制设置
+    Json::Value controlSettings;
+    controlSettings["vibration"] = is_shake;        //振动反馈
+    root["controls"] = controlSettings;
+
+    Json::StreamWriterBuilder writer;
+    std::unique_ptr<Json::StreamWriter> jsonWriter(writer.newStreamWriter());
+    std::ofstream file("./resources/setting.json");
+    jsonWriter->write(root, &file);
+}
+
+BOOL WINAPI ConsoleHandler(DWORD event)
+{
+    switch (event)
+    {
+    case CTRL_LOGOFF_EVENT: // 用户注销
+    case CTRL_SHUTDOWN_EVENT: // 系统关机
+    case CTRL_CLOSE_EVENT:  // 捕获控制台窗口关闭事件
+    case CTRL_C_EVENT:      // Ctrl+C事件
+    case CTRL_BREAK_EVENT:  // Ctrl+Break事件[
+        saveSetting();
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
 int main(int argc, char** argv)
 {
-    init();
+    if (!SetConsoleCtrlHandler(ConsoleHandler, TRUE)) return 1;
+    if (init()) return 1;
+
     mainloop();
+    saveSetting();
     deinit();
 
     return 0;

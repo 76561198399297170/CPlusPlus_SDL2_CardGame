@@ -7,7 +7,9 @@ extern int window_height;
 
 MenuTable::MenuTable()
 {
-	this->m_tab_music = new MusicTable();
+	this->m_tab_volume = new VolumeTable();
+	this->m_tab_video = new VideoTable();
+	this->m_tab_controls = new ControlsTable();
 
 	this->m_ani_background = new Animation();
 
@@ -17,11 +19,14 @@ MenuTable::MenuTable()
 			this->close();
 		});
 
-	this->m_btn_music = button_factory->create("Menu_Setting_Music", 380, 120);
-	this->m_btn_music->addOnKeyupFunction([this]()
-		{
-			this->m_tab_music->open();
-		});
+	this->m_btn_volume = button_factory->create("Menu_Setting_Volume", 380, 120);
+	this->m_btn_volume->addOnKeyupFunction([this]() { this->m_tab_volume->open(); });
+
+	this->m_btn_video = button_factory->create("Menu_Setting_Video", 380, 270);
+	this->m_btn_video->addOnKeyupFunction([this]() { this->m_tab_video->open(); });
+
+	this->m_btn_control = button_factory->create("Menu_Setting_Controls", 380, 420);
+	this->m_btn_control->addOnKeyupFunction([this]() {this->m_tab_controls->open(); });
 
 	int w, h;
 
@@ -40,25 +45,39 @@ void MenuTable::render(const Camera* camera)
 	if (this->is_close) return;
 
 	this->m_ani_background->render(camera);
-	this->m_btn_music->render(camera->m_renderer);
 	this->m_btn_close->render(camera->m_renderer);
 
-	this->m_tab_music->render(camera);
+	this->m_btn_volume->render(camera->m_renderer);
+	this->m_btn_video->render(camera->m_renderer);
+	this->m_btn_control->render(camera->m_renderer);
+
+	this->m_tab_volume->render(camera);
+	this->m_tab_video->render(camera);
+	this->m_tab_controls->render(camera);
 }
 
 void MenuTable::update(float delta)
 {
 	if (this->is_close) return;
-	this->m_tab_music->update(delta);
-	this->m_btn_music->update(delta);
+
 	this->m_btn_close->update(delta);
 	this->m_ani_background->update(delta);
+
+	this->m_btn_volume->update(delta);
+	this->m_btn_video->update(delta);
+	this->m_btn_control->update(delta);
+
+	this->m_tab_volume->update(delta);
+	this->m_tab_video->update(delta);
+	this->m_tab_controls->update(delta);
 }
 
 bool MenuTable::input(SDL_Event& event)
 {
 	if (this->is_close) return true;
-	if (!this->m_tab_music->input(event)) return false;
+	if (!this->m_tab_volume->input(event)) return false;
+	else if (!this->m_tab_video->input(event)) return false;
+	else if (!this->m_tab_controls->input(event)) return false;
 
 	if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
 	{
@@ -67,7 +86,10 @@ bool MenuTable::input(SDL_Event& event)
 	}
 
 	this->m_btn_close->input(event);
-	this->m_btn_music->input(event);
+
+	this->m_btn_volume->input(event);
+	this->m_btn_video->input(event);
+	this->m_btn_control->input(event);
 
 	return false;
 }

@@ -3,7 +3,7 @@
 #include <SDL_image.h>
 #include <filesystem>
 
-int font_size = 24;
+extern int font_size;
 
 void ResourcesManager::loadResources(SDL_Renderer* renderer)
 {

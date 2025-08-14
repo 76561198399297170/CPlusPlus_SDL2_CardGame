@@ -1,33 +1,48 @@
 #include "sceneManager.h"
+#include <iostream>
 
 extern GameScene* game_scene;
 extern MenuScene* menu_scene;
 extern MapScene* map_scene;
 
-void SceneManager::switchTo(SceneType switch_to, bool is_exit)
+void SceneManager::switchTo(SceneType switch_to, int sleep_time, bool is_exit)
 {
+	this->m_timer_sleep.reset();
+	this->m_timer_sleep.setDuration(sleep_time);
+	this->m_timer_sleep.start();
+
 	if (is_exit) this->m_scene->exit();
 
-	switch (switch_to)
-	{
-	case SceneType::Menu:
-		this->m_scene = menu_scene->getInstance();
-		break;
-	case SceneType::Map:
-		this->m_scene = map_scene->getInstance();
-		break;
-	case SceneType::Game:
-		this->m_scene = game_scene->getInstance();
-		break;
-	default:
-		break;
-	}
-	this->m_scene->enter();
+	this->m_switch_to = switch_to;
 }
 
 void SceneManager::update(float delta)
 {
+	this->m_timer_sleep.update(delta);
 	this->m_scene->update(delta);
+
+	std::cout << this->m_timer_sleep.getPercentage() << "%\n"; 
+
+	if (this->m_timer_sleep.isReached() && this->m_switch_to != SceneType::None)
+	{
+
+		switch (this->m_switch_to)
+		{
+		case SceneType::Menu:
+			this->m_scene = menu_scene->getInstance();
+			break;
+		case SceneType::Map:
+			this->m_scene = map_scene->getInstance();
+			break;
+		case SceneType::Game:
+			this->m_scene = game_scene->getInstance();
+			break;
+		default:
+			break;
+		}
+		this->m_scene->enter();
+		this->m_switch_to = SceneType::None;
+	}
 }
 
 void SceneManager::render(SDL_Renderer* renderer, const Camera* camera)

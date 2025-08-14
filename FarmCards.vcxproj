@@ -134,13 +134,15 @@
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="button.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="controlsTable.cpp" />
     <ClCompile Include="cursorManager.cpp" />
     <ClCompile Include="gameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mapScene.cpp" />
     <ClCompile Include="menuScene.cpp" />
     <ClCompile Include="menuTable.cpp" />
-    <ClCompile Include="musicTable.cpp" />
+    <ClCompile Include="videoTable.cpp" />
+    <ClCompile Include="volumeTable.cpp" />
     <ClCompile Include="resourcesManager.cpp" />
     <ClCompile Include="sceneManager.cpp" />
     <ClCompile Include="timer.cpp" />
@@ -150,14 +152,15 @@
   <ItemGroup>
     <ClInclude Include="button.h" />
     <ClInclude Include="camera.h" />
-    <ClInclude Include="cardEnum.h" />
     <ClInclude Include="animation.h" />
+    <ClInclude Include="controlsTable.h" />
     <ClInclude Include="cursorManager.h" />
     <ClInclude Include="gameScene.h" />
     <ClInclude Include="mapScene.h" />
     <ClInclude Include="menuScene.h" />
     <ClInclude Include="menuTable.h" />
-    <ClInclude Include="musicTable.h" />
+    <ClInclude Include="videoTable.h" />
+    <ClInclude Include="volumeTable.h" />
     <ClInclude Include="resourcesManager.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="sceneManager.h" />

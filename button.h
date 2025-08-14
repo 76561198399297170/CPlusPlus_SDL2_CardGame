@@ -52,6 +52,7 @@ public:
 	Vector2 getPosition() { return Vector2{ this->m_rect_dst.x, this->m_rect_dst.y }; }
 
 public:
+	bool is_show = true;//是否显示
 	Vector2 m_move_base;//临时偏移位置
 	Vector2 m_flag;//创建时原始位置
 	Vector2 m_flag_pmv;//最大移动正范围

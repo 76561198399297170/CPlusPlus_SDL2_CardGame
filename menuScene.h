@@ -22,8 +22,10 @@ public:
 	virtual void update(float delta);
 	virtual void input(SDL_Event& event);
 
-private:
+public:
 	int m_music_cannel;
+
+private:
 
 	Animation* m_bk_sky;
 	Animation* m_bk_sun;

@@ -3,8 +3,14 @@
 #include <mutex>
 #include <ctime>
 
+extern int window_width;
+extern int window_height;
+
 Camera::Camera(SDL_Renderer* renderer)
 {
+	this->m_timer_light.setDuration(600);
+	this->m_timer_light.start();
+
 	this->is_shaking = false;
 	this->m_renderer = renderer;
 
@@ -31,9 +37,11 @@ void Camera::reset()
 void Camera::update(float delta)
 {
 	this->m_timer_shake.update(delta);
+	this->m_timer_light.update(delta);
 
 	if (this->is_shaking)
 	{
+		//正弦余弦叠加抖动
 		float elapsed_time = m_timer_shake.getPercentage() * this->m_timer_shake.getDurattion();
 
         float speed_factor = m_shaking_strength * 3.0f;
@@ -53,18 +61,16 @@ void Camera::update(float delta)
         m_position.m_x = x_base + x_elastic + x_jitter + m_initial_offset_x;
         m_position.m_y = y_base + y_elastic + y_jitter + m_initial_offset_y;
 
+		//矩形随机位置抖动
 		//this->m_position.m_x = (-50 + rand() % 100) / 50.0f * this->m_shaking_strength;
 		//this->m_position.m_y = (-50 + rand() % 100) / 50.0f * this->m_shaking_strength;
 	}
 }
 
-void Camera::render(SDL_Texture* texture, const SDL_Rect* rect_src, const SDL_FRect* rect_dest, double angle, const SDL_FPoint* center) const
+void Camera::render()
 {
-	SDL_FRect rect_dst_win = *rect_dest;
-	rect_dst_win.x -= this->m_position.m_x;
-	rect_dst_win.y -= this->m_position.m_y;
-
-	SDL_RenderCopyExF(this->m_renderer, texture, rect_src, &rect_dst_win, angle, center, SDL_RendererFlip::SDL_FLIP_NONE);
+	float per = this->m_timer_light.getPercentage();
+	copyexRect(this->m_renderer, 0, 0, 0, std::abs((this->is_light ? 255 : 0) - (per / 100.0f) * 255), -50, -50, window_width + 50, window_height + 50);
 }
 
 void Camera::shake(float duration, float strength)
@@ -83,4 +89,13 @@ void Camera::shake(float duration, float strength)
 	this->m_timer_shake.setDuration(duration);
 	this->m_timer_shake.reset();
 	this->m_timer_shake.start();
+}
+
+void Camera::turnLight(float duration)
+{
+	this->is_light = !this->is_light;
+
+	this->m_timer_light.reset();
+	this->m_timer_light.setDuration(duration);
+	this->m_timer_light.start();
 }
