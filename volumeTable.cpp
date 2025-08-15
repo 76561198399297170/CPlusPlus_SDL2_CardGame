@@ -3,8 +3,6 @@
 #include "cursorManager.h"
 #include "utils.h"
 
-extern ButtonFactory* button_factory;
-
 extern int window_width;
 extern int window_height;
 
@@ -14,13 +12,13 @@ VolumeTable::VolumeTable()
 	this->m_ani_background_silde = new Animation();
 	this->m_ani_volume = new Animation();
 
-	this->m_btn_close = button_factory->create("Table_Exit", 950, 165);
+	this->m_btn_close = ButtonFactory::getInstance()->create("Table_Exit", 950, 165);
 	this->m_btn_close->addOnKeyupFunction([this]()
 		{
 			this->close();
 		});
 
-	this->m_btn_volume_slide = button_factory->create("Menu_Setting_Volume_Music", 385, 225);
+	this->m_btn_volume_slide = ButtonFactory::getInstance()->create("Menu_Setting_Volume_Music", 385, 225);
 
 	int w, h;
 
@@ -83,4 +81,9 @@ bool VolumeTable::input(SDL_Event& event)
 	this->m_btn_close->input(event);
 
 	return false;
+}
+
+void VolumeTable::reload()
+{
+	this->m_btn_volume_slide->setPosition(this->m_btn_volume_slide->m_flag.m_x - this->m_btn_volume_slide->m_flag_nmv.m_x + 4 * Mix_Volume(-1, -1), this->m_btn_volume_slide->m_flag.m_y);
 }

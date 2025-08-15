@@ -3,14 +3,12 @@
 #include "cursorManager.h"
 
 #include <SDL_mixer.h>
-#include "myTable.h"
+#include "table.h"
 
 extern int window_width;
 extern int window_height;
 
 extern Camera* main_camera;
-
-extern ButtonFactory* button_factory;
 
 MenuScene::MenuScene()
 {
@@ -20,19 +18,19 @@ MenuScene::MenuScene()
     this->m_bk_sun = new Animation();
     this->m_bk_plc = new Animation();
 
-    this->m_btn_start = button_factory->create("Menu_Start", 100, 100, true);
+    this->m_btn_start = ButtonFactory::getInstance()->create("Menu_Start", 100, 100, true);
     this->m_btn_start->addOnKeyupFunction([this]()
         {
-            this->is_input = false;
+            MenuScene::getInstance()->setInput(false);
         });
 
-    this->m_btn_setting = button_factory->create("Menu_Setting", 100, 300, true);
+    this->m_btn_setting = ButtonFactory::getInstance()->create("Menu_Setting", 100, 300, true);
     this->m_btn_setting->addOnKeyupFunction([this]()
         {
             this->m_tab_setting->open();
         });
 
-    this->m_btn_exit = button_factory->create("Menu_Exit", 100, 500, true);
+    this->m_btn_exit = ButtonFactory::getInstance()->create("Menu_Exit", 100, 500, true);
 
     int w, h;
 
@@ -75,6 +73,14 @@ MenuScene::MenuScene()
 void MenuScene::enter()
 {
     this->is_input = true;
+
+    this->m_tab_setting->reload();
+    this->m_btn_start->restart();
+    this->m_btn_setting->restart();
+    this->m_btn_exit->restart();
+
+    this->m_tab_setting->close();
+
     main_camera->turnLight(2000);
     this->m_music_cannel = Mix_FadeInChannel(-1, ResourcesManager::getInstance()->queryAudio("background_music"), -1, 3500);
 }

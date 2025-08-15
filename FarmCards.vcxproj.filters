@@ -60,9 +60,6 @@
     <ClCompile Include="gameScene.cpp">
       <Filter>源文件\source</Filter>
     </ClCompile>
-    <ClCompile Include="mapScene.cpp">
-      <Filter>源文件\source</Filter>
-    </ClCompile>
     <ClCompile Include="sceneManager.cpp">
       <Filter>源文件\source</Filter>
     </ClCompile>
@@ -82,6 +79,12 @@
       <Filter>源文件\source</Filter>
     </ClCompile>
     <ClCompile Include="controlsTable.cpp">
+      <Filter>源文件\source</Filter>
+    </ClCompile>
+    <ClCompile Include="gameTable.cpp">
+      <Filter>源文件\source</Filter>
+    </ClCompile>
+    <ClCompile Include="settingsManager.cpp">
       <Filter>源文件\source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -119,9 +122,6 @@
     <ClInclude Include="gameScene.h">
       <Filter>头文件\scene</Filter>
     </ClInclude>
-    <ClInclude Include="mapScene.h">
-      <Filter>头文件\scene</Filter>
-    </ClInclude>
     <ClInclude Include="sceneManager.h">
       <Filter>头文件\manager</Filter>
     </ClInclude>
@@ -131,7 +131,7 @@
     <ClInclude Include="menuTable.h">
       <Filter>头文件\table</Filter>
     </ClInclude>
-    <ClInclude Include="myTable.h">
+    <ClInclude Include="table.h">
       <Filter>头文件\table</Filter>
     </ClInclude>
     <ClInclude Include="volumeTable.h">
@@ -142,6 +142,12 @@
     </ClInclude>
     <ClInclude Include="videoTable.h">
       <Filter>头文件\table</Filter>
+    </ClInclude>
+    <ClInclude Include="gameTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="settingsManager.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

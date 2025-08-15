@@ -6,6 +6,8 @@
 extern int window_width;
 extern int window_height;
 
+extern bool is_shake;
+
 Camera::Camera(SDL_Renderer* renderer)
 {
 	this->m_timer_light.setDuration(600);
@@ -75,6 +77,8 @@ void Camera::render()
 
 void Camera::shake(float duration, float strength)
 {
+	if (!is_shake) return;
+
 	this->m_shake_place = this->m_position;
 
 	this->is_shaking = true;

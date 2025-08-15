@@ -1,9 +1,7 @@
 #include "sceneManager.h"
-#include <iostream>
 
 extern GameScene* game_scene;
 extern MenuScene* menu_scene;
-extern MapScene* map_scene;
 
 void SceneManager::switchTo(SceneType switch_to, int sleep_time, bool is_exit)
 {
@@ -21,8 +19,6 @@ void SceneManager::update(float delta)
 	this->m_timer_sleep.update(delta);
 	this->m_scene->update(delta);
 
-	std::cout << this->m_timer_sleep.getPercentage() << "%\n"; 
-
 	if (this->m_timer_sleep.isReached() && this->m_switch_to != SceneType::None)
 	{
 
@@ -30,9 +26,6 @@ void SceneManager::update(float delta)
 		{
 		case SceneType::Menu:
 			this->m_scene = menu_scene->getInstance();
-			break;
-		case SceneType::Map:
-			this->m_scene = map_scene->getInstance();
 			break;
 		case SceneType::Game:
 			this->m_scene = game_scene->getInstance();

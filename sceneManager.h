@@ -5,7 +5,6 @@
 #include "timer.h"
 #include "menuScene.h"
 #include "gameScene.h"
-#include "mapScene.h"
 
 
 class SceneManager : public Singleton<SceneManager>

@@ -17,9 +17,10 @@ public:
 	virtual void render(const Camera* camera) {}
 	virtual void update(float delta) {}
 	virtual bool input(SDL_Event& event) { return this->is_close; }
+	virtual void reload() {};
 
 	void open() { this->is_close = false; }
-	void close() { Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0); this->is_close = true; }
+	void close() { this->is_close = true; }
 
 	bool isClose() { return this->is_close; }
 

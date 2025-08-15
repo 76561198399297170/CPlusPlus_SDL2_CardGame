@@ -1,7 +1,7 @@
 #ifndef _VIDEO_TABLE_H_
 #define _VIDEO_TABLE_H_
 
-#include "myTable.h"
+#include "table.h"
 
 
 class VideoTable : public Table
@@ -10,9 +10,10 @@ public:
 	VideoTable();
 	~VideoTable() = default;
 
-	virtual void render(const Camera* camera);
-	virtual void update(float delta);
-	virtual bool input(SDL_Event& event);
+	void render(const Camera* camera);
+	void update(float delta);
+	bool input(SDL_Event& event);
+	void reload();
 
 private:
 	Button* m_btn_screen_check_box;

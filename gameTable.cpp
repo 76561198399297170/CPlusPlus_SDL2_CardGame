@@ -1,9 +1,10 @@
-#include "menuTable.h"
+#include "gameTable.h"
+#include "sceneManager.h"
 
 extern int window_width;
 extern int window_height;
 
-MenuTable::MenuTable()
+GameTable::GameTable()
 {
 	this->m_tab_volume = new VolumeTable();
 	this->m_tab_video = new VideoTable();
@@ -12,10 +13,7 @@ MenuTable::MenuTable()
 	this->m_ani_background = new Animation();
 
 	this->m_btn_close = ButtonFactory::getInstance()->create("Table_Exit", 850, 25);
-	this->m_btn_close->addOnKeyupFunction([this]()
-		{
-			this->close();
-		});
+	this->m_btn_close->addOnKeyupFunction([this]() { this->close(); });
 
 	this->m_btn_volume = ButtonFactory::getInstance()->create("Menu_Setting_Volume", 380, 120);
 	this->m_btn_volume->addOnKeyupFunction([this]() { this->m_tab_volume->open(); });
@@ -26,19 +24,24 @@ MenuTable::MenuTable()
 	this->m_btn_control = ButtonFactory::getInstance()->create("Menu_Setting_Controls", 380, 420);
 	this->m_btn_control->addOnKeyupFunction([this]() {this->m_tab_controls->open(); });
 
+	this->m_btn_exit = ButtonFactory::getInstance()->create("Game_Setting_Exit", 380, 570);
+	this->m_btn_exit->addOnKeyupFunction([this]()
+		{
+			GameScene::getInstance()->setInput(false);
+			SceneManager::getInstance()->switchTo(SceneManager::SceneType::Menu, 3000); 
+		});
+
 	int w, h;
 
 	SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("setting_table"), nullptr, nullptr, &w, &h);
 	w /= 3;
-
 	this->m_ani_background->setDstFRect({ (window_width - w) / 2.0f, (window_height - h) / 2.0f, (float)w, (float)h });
 	this->m_ani_background->setPlayMode(Animation::PlayMode::LOOP);
 	this->m_ani_background->addFramesFromSheetResource("setting_table", 3, 60, false);
 	this->m_ani_background->play();
-
 }
 
-void MenuTable::render(const Camera* camera)
+void GameTable::render(const Camera* camera)
 {
 	if (this->is_close) return;
 
@@ -48,13 +51,14 @@ void MenuTable::render(const Camera* camera)
 	this->m_btn_volume->render(camera->m_renderer);
 	this->m_btn_video->render(camera->m_renderer);
 	this->m_btn_control->render(camera->m_renderer);
+	this->m_btn_exit->render(camera->m_renderer);
 
 	this->m_tab_volume->render(camera);
 	this->m_tab_video->render(camera);
 	this->m_tab_controls->render(camera);
 }
 
-void MenuTable::update(float delta)
+void GameTable::update(float delta)
 {
 	if (this->is_close) return;
 
@@ -64,13 +68,14 @@ void MenuTable::update(float delta)
 	this->m_btn_volume->update(delta);
 	this->m_btn_video->update(delta);
 	this->m_btn_control->update(delta);
+	this->m_btn_exit->update(delta);
 
 	this->m_tab_volume->update(delta);
 	this->m_tab_video->update(delta);
 	this->m_tab_controls->update(delta);
 }
 
-bool MenuTable::input(SDL_Event& event)
+bool GameTable::input(SDL_Event& event)
 {
 	if (this->is_close) return true;
 	if (!this->m_tab_volume->input(event)) return false;
@@ -88,11 +93,12 @@ bool MenuTable::input(SDL_Event& event)
 	this->m_btn_volume->input(event);
 	this->m_btn_video->input(event);
 	this->m_btn_control->input(event);
+	this->m_btn_exit->input(event);
 
 	return false;
 }
 
-void MenuTable::reload()
+void GameTable::reload()
 {
 	this->m_tab_controls->reload();
 	this->m_tab_video->reload();

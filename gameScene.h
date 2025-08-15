@@ -3,13 +3,14 @@
 
 #include "scene.h"
 #include "singleton.h"
+#include "gameTable.h"
 
 
 class GameScene : public Scene, public Singleton<GameScene>
 {
 	friend class Singleton<GameScene>;
 public:
-	GameScene() = default;
+	GameScene();
 	~GameScene() = default;
 
 	virtual void enter();
@@ -20,7 +21,9 @@ public:
 	virtual void input(SDL_Event& event);
 
 private:
+	Button* m_btn_setting;
 
+	GameTable* m_tab_setting;
 };
 
 #endif

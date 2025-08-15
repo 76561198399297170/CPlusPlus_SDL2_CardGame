@@ -24,6 +24,8 @@ public:
 	virtual void update(float delta) {}
 	virtual void input(SDL_Event& event) {}
 
+	void setInput(bool i) { this->is_input = i; }
+
 protected:
 	bool is_input = true;
 

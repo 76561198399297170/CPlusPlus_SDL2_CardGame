@@ -1,11 +1,11 @@
 #include "videoTable.h"
 
-extern ButtonFactory* button_factory;
-
 extern int window_width;
 extern int window_height;
 
 extern bool is_full_screen;
+extern bool is_vsync;
+extern bool is_vsync_change;
 
 VideoTable::VideoTable()
 {
@@ -16,18 +16,20 @@ VideoTable::VideoTable()
 	this->m_ani_icon_full_screen = new Animation();
 	this->m_ani_icon_tips = new Animation();
 
-	this->m_btn_screen_check_box = button_factory->create("Full_Screen_Check_Box", 800, 500);
+	this->m_btn_screen_check_box = ButtonFactory::getInstance()->create("Full_Screen_Check_Box", 800, 500);
 
-	this->m_btn_close = button_factory->create("Table_Exit", 950, 165);
+	this->m_btn_close = ButtonFactory::getInstance()->create("Table_Exit", 950, 165);
 	this->m_btn_close->addOnKeyupFunction([this]()
 		{
 			this->close();
 		});
 
-	this->m_btn_vsync_check_box = button_factory->create("Set_Vsync_Check_Box", 800, 400);
+	this->m_ani_icon_tips->is_show = is_vsync_change;
+	this->m_btn_vsync_check_box = ButtonFactory::getInstance()->create("Set_Vsync_Check_Box", 800, 400);
 	this->m_btn_vsync_check_box->addOnKeyupFunction([this]()
 		{
-			this->m_ani_icon_tips->is_show = !this->m_ani_icon_tips->is_show;
+			//this->m_ani_icon_tips->is_show = !this->m_ani_icon_tips->is_show;
+			this->m_ani_icon_tips->is_show = is_vsync_change;
 		});
 
 	int w, h;
@@ -120,4 +122,12 @@ bool VideoTable::input(SDL_Event& event)
 	this->m_btn_close->input(event);
 
 	return false;
+}
+
+void VideoTable::reload()
+{
+	this->m_btn_screen_check_box->is_show = is_full_screen;
+	this->m_btn_vsync_check_box->is_show = is_vsync;
+
+	this->m_ani_icon_tips->is_show = is_vsync_change;
 }

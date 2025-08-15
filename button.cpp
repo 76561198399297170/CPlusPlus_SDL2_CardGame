@@ -11,6 +11,7 @@ extern bool is_quit;
 extern bool is_full_screen;
 extern bool is_vsync;
 extern bool is_shake;
+extern bool is_vsync_change;
 
 Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_streaming)
 {
@@ -46,7 +47,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		button->setOnKeyupFunction([button]()
 			{
 				button->m_tex_keydown->reset();
-				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
 				SceneManager::getInstance()->switchTo(SceneManager::SceneType::Game, 3000);
 				button->m_tex_float->play();
 			});
@@ -83,7 +83,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		button->setOnKeyupFunction([button]()
 			{
 				button->m_tex_keydown->reset();
-				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
 				button->m_type = Button::ButtonType::Normal;
 				button->m_tex_normal->play();
 			});
@@ -120,7 +119,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		button->setOnKeyupFunction([button]()
 			{
 				button->m_tex_keydown->reset();
-				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
 				button->m_tex_float->play();
 				is_quit = true;
 			});
@@ -230,7 +228,7 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 				button->m_tex_normal->play();
 			});
 		button->m_tex_normal->play();
-		}
+	}
 	else if (button_type == "Menu_Setting_Controls")
 	{
 		int w, h, n = 3;
@@ -265,7 +263,7 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 				button->m_tex_normal->play();
 			});
 		button->m_tex_normal->play();
-		}
+	}
 	else if (button_type == "Menu_Setting_Volume_Music")
 	{
 		int w, h;
@@ -287,7 +285,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			});
 		button->setOnKeyupFunction([button]()
 			{
-				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
 				button->m_type = Button::ButtonType::Normal;
 			});
 		CursorManager* cur_mgr = CursorManager::getInstance();
@@ -324,7 +321,6 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			});
 		button->setOnKeyupFunction([button]()
 			{
-				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
 				is_full_screen = !is_full_screen;
 				setFullScreen(window, is_full_screen);
 				button->is_show = !button->is_show;
@@ -341,7 +337,7 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
-		button->is_show = is_vsync;
+		button->is_show = (is_vsync && !is_vsync_change);
 
 		button->setTextureSheet("check_box_t", "check_box_t", "check_box_t", 3, 3, 3, 60, 60, 60);
 		button->setOnFloatFunction([button]()
@@ -350,8 +346,8 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			});
 		button->setOnKeyupFunction([button]()
 			{
-				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
 				is_vsync = !is_vsync;
+				is_vsync_change = !is_vsync_change;
 				button->is_show = !button->is_show;
 			});
 		button->m_tex_normal->play();
@@ -375,12 +371,81 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			});
 		button->setOnKeyupFunction([button]()
 			{
-				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("duang"), 0);
 				is_shake = !is_shake;
 				button->is_show = !button->is_show;
 			});
 		button->m_tex_normal->play();
 		button->m_tex_float->play();
+	}
+	else if (button_type == "Game_Setting")
+	{
+		int w, h, n = 3;
+		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("game_setting_n", false), nullptr, nullptr, &w, &h);
+		w /= n;
+
+		button->m_rect_center = { w / 2.0f, h / 2.0f };
+		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
+		button->m_rect_src = { 0, 0, w, h };
+
+		button->setTextureSheet("game_setting_n", "game_setting_f", "game_setting_k", 3, 3, 3, 60, 60, 60);
+		button->setOnFloatFunction([button]()
+			{
+				button->m_tex_normal->reset();
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("yee"), 0);
+				button->m_tex_float->play();
+			});
+		button->setOutFloatFunction([button]()
+			{
+				button->m_tex_float->reset();
+				button->m_tex_normal->play();
+			});
+		button->setOnKeydownFunction([button]()
+			{
+				button->m_tex_float->reset();
+				button->m_tex_keydown->play();
+			});
+		button->setOnKeyupFunction([button]()
+			{
+				button->m_tex_keydown->reset();
+				button->m_type = Button::ButtonType::Normal;
+				button->m_tex_normal->play();
+			});
+		button->m_tex_normal->play();
+	}
+	else if (button_type == "Game_Setting_Exit")
+	{
+		int w, h, n = 3;
+		SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("width_exit_n", false), nullptr, nullptr, &w, &h);
+		w /= n;
+
+		button->m_rect_center = { w / 2.0f, h / 2.0f };
+		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
+		button->m_rect_src = { 0, 0, w, h };
+
+		button->setTextureSheet("width_exit_n", "width_exit_f", "width_exit_k", 3, 3, 3, 60, 60, 60);
+		button->setOnFloatFunction([button]()
+			{
+				button->m_tex_normal->reset();
+				Mix_PlayChannel(-1, ResourcesManager::getInstance()->queryAudio("yee"), 0);
+				button->m_tex_float->play();
+			});
+		button->setOutFloatFunction([button]()
+			{
+				button->m_tex_float->reset();
+				button->m_tex_normal->play();
+			});
+		button->setOnKeydownFunction([button]()
+			{
+				button->m_tex_float->reset();
+				button->m_tex_keydown->play();
+			});
+		button->setOnKeyupFunction([button]()
+			{
+				button->m_tex_keydown->reset();
+				button->m_type = Button::ButtonType::Normal;
+				button->m_tex_normal->play();
+			});
+		button->m_tex_normal->play();
 	}
 
     return button;
@@ -470,6 +535,16 @@ void Button::input(SDL_Event& event)
 	}
 }
 
+void Button::restart()
+{
+	this->m_type = Button::ButtonType::Normal;
+	this->m_tex_normal->reset();
+	this->m_tex_float->reset();
+	this->m_tex_keydown->reset();
+
+	this->m_tex_normal->play();
+}
+
 void Button::addOnKeyupFunction(std::function<void()> func)
 {
 	std::function<void()> old_action = this->on_keyup;
@@ -540,10 +615,12 @@ bool Button::isOnButton(const SDL_Point& pos) const
 	return this->isOnButton(Vector2{ (float)pos.x, (float)pos.y });
 }
 
-bool Button::isOnButton_ex(const Vector2& pos) const {
+bool Button::isOnButton_ex(const Vector2& pos) const
+{
 	// 1. 快速矩形范围判断
 	if (pos.m_x < m_rect_dst.x || pos.m_x >= m_rect_dst.x + m_rect_dst.w ||
-		pos.m_y < m_rect_dst.y || pos.m_y >= m_rect_dst.y + m_rect_dst.h) {
+		pos.m_y < m_rect_dst.y || pos.m_y >= m_rect_dst.y + m_rect_dst.h)
+	{
 		return false;
 	}
 
@@ -553,11 +630,13 @@ bool Button::isOnButton_ex(const Vector2& pos) const {
 
 	// 3. 检查纹理是否为流模式
 	int access;
-	if (SDL_QueryTexture(tex, nullptr, &access, nullptr, nullptr) != 0) {
+	if (SDL_QueryTexture(tex, nullptr, &access, nullptr, nullptr) != 0)
+	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_QueryTexture failed: %s", SDL_GetError());
 		return false;
 	}
-	if (access != SDL_TEXTUREACCESS_STREAMING) {
+	if (access != SDL_TEXTUREACCESS_STREAMING)
+	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Texture is not streaming");
 		return false;
 	}
@@ -565,7 +644,8 @@ bool Button::isOnButton_ex(const Vector2& pos) const {
 	// 4. 获取纹理尺寸和格式
 	int w, h;
 	Uint32 format;
-	if (SDL_QueryTexture(tex, &format, nullptr, &w, &h) != 0) {
+	if (SDL_QueryTexture(tex, &format, nullptr, &w, &h) != 0)
+	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_QueryTexture failed: %s", SDL_GetError());
 		return false;
 	}
@@ -576,7 +656,8 @@ bool Button::isOnButton_ex(const Vector2& pos) const {
 	int texX = static_cast<int>((pos.m_x - m_rect_dst.x) * scaleX + 0.5f);
 	int texY = static_cast<int>((pos.m_y - m_rect_dst.y) * scaleY + 0.5f);
 
-	if (texX < 0 || texX >= w || texY < 0 || texY >= h) {
+	if (texX < 0 || texX >= w || texY < 0 || texY >= h)
+	{
 		return false;
 	}
 
@@ -584,7 +665,8 @@ bool Button::isOnButton_ex(const Vector2& pos) const {
 	void* pixels;
 	int pitch;
 	// 锁定整个纹理（pitch是行字节数，不是像素字节数）
-	if (SDL_LockTexture(tex, nullptr, &pixels, &pitch) != 0) {
+	if (SDL_LockTexture(tex, nullptr, &pixels, &pitch) != 0)
+	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_LockTexture failed: %s", SDL_GetError());
 		return false;
 	}
@@ -595,7 +677,8 @@ bool Button::isOnButton_ex(const Vector2& pos) const {
 
 	// 计算每个像素的字节数（根据纹理格式）
 	int bytesPerPixel = 0;
-	switch (format) {
+	switch (format)
+	{
 	case SDL_PIXELFORMAT_ARGB8888:
 	case SDL_PIXELFORMAT_RGBA8888:
 	case SDL_PIXELFORMAT_BGRA8888:
@@ -613,7 +696,8 @@ bool Button::isOnButton_ex(const Vector2& pos) const {
 	Uint32* pixel = reinterpret_cast<Uint32*>(&pixelData[pixelOffset]);
 
 	// 提取alpha值
-	switch (format) {
+	switch (format)
+	{
 	case SDL_PIXELFORMAT_ARGB8888:
 		alpha = (*pixel >> 24) & 0xFF;
 		break;

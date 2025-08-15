@@ -1,7 +1,7 @@
 #ifndef _VOLUME_TABLE_H_
 #define _VOLUME_TABLE_H_
 
-#include "myTable.h"
+#include "table.h"
 
 
 class VolumeTable : public Table
@@ -13,6 +13,7 @@ public:
 	virtual void render(const Camera* camera);
 	virtual void update(float delta);
 	virtual bool input(SDL_Event& event);
+	virtual void reload();
 
 private:
 	Button* m_btn_volume_slide;

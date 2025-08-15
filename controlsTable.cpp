@@ -1,9 +1,9 @@
 #include "controlsTable.h"
 
-extern ButtonFactory* button_factory;
-
 extern int window_width;
 extern int window_height;
+
+extern bool is_shake;
 
 ControlsTable::ControlsTable()
 {
@@ -11,13 +11,13 @@ ControlsTable::ControlsTable()
 	this->m_ani_bk_shake_check_box = new Animation();
 	this->m_ani_icon_shake = new Animation();
 
-	this->m_btn_close = button_factory->create("Table_Exit", 950, 165);
+	this->m_btn_close = ButtonFactory::getInstance()->create("Table_Exit", 950, 165);
 	this->m_btn_close->addOnKeyupFunction([this]()
 		{
 			this->close();
 		});
 
-	this->m_btn_shake_check_box = button_factory->create("Set_Shake_Check_Box", 800, 500);
+	this->m_btn_shake_check_box = ButtonFactory::getInstance()->create("Set_Shake_Check_Box", 800, 500);
 
 	int w, h;
 
@@ -79,4 +79,9 @@ bool ControlsTable::input(SDL_Event& event)
 	this->m_btn_shake_check_box->input(event);
 	this->m_btn_close->input(event);
 	return false;
+}
+
+void ControlsTable::reload()
+{
+	this->m_btn_shake_check_box->is_show = is_shake;
 }

@@ -20,6 +20,7 @@
 #include "utils.h"
 #include <iostream>
 
+
 #define u8(x) u8##x
 
 
@@ -27,6 +28,7 @@ bool is_quit = false;
 bool is_shake = true;
 bool is_full_screen = false;
 bool is_vsync = true;
+bool is_vsync_change = false;
 
 int fps = 60;
 int font_size = 24;
@@ -41,13 +43,10 @@ Camera* main_camera = nullptr;
 
 GameScene* game_scene = nullptr;
 MenuScene* menu_scene = nullptr;
-MapScene* map_scene = nullptr;
 
 ResourcesManager* res_mgr = nullptr;
 CursorManager* cur_mgr = nullptr;
 SceneManager* scn_mgr = nullptr;
-
-ButtonFactory* button_factory;
 
 bool load_resources()
 {
@@ -77,7 +76,7 @@ bool load_resources()
 
 void delete_resources()
 {
-    delete button_factory;
+
 }
 
 bool init()
@@ -99,12 +98,11 @@ bool init()
 
     if (load_resources()) return true;
 
-    SDL_RendererInfo info;
-    SDL_GetRendererInfo(renderer, &info);
-    Uint32 flag = info.flags;
+    Uint32 flag = SDL_RENDERER_ACCELERATED;
     if (is_vsync) flag |= SDL_RENDERER_PRESENTVSYNC;
-    else flag &= ~SDL_RENDERER_PRESENTVSYNC;
     renderer = SDL_CreateRenderer(window, -1, flag);
+
+    if (!renderer) return true;
 
     SDL_ShowCursor(SDL_DISABLE);
     
@@ -112,11 +110,9 @@ bool init()
     res_mgr->getInstance()->loadResources(renderer);
 
     menu_scene = MenuScene::getInstance();
-    map_scene = MapScene::getInstance();
     game_scene = GameScene::getInstance();
 
     main_camera = new Camera(renderer);
-    button_factory = new ButtonFactory();
 
     cur_mgr = CursorManager::getInstance();
 

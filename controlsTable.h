@@ -1,7 +1,9 @@
 #ifndef _CONTROLS_TABLE_H_
 #define _CONTROLS_TABLE_H_
 
-#include "myTable.h"
+#include "table.h"
+
+
 class ControlsTable : public Table
 {
 public:
@@ -11,6 +13,7 @@ public:
 	void render(const Camera* camera);
 	void update(float delta);
 	bool input(SDL_Event& event);
+	void reload();
 
 private:
 	Button* m_btn_shake_check_box;

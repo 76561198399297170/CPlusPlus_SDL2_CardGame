@@ -7,11 +7,11 @@
 	{
 		"fullscreen" : false,
 		"height" : 720,
-		"vsync" : false,
+		"vsync" : true,
 		"width" : 1280
 	},
 	"volume" : 
 	{
-		"music" : 20
+		"music" : 17
 	}
 }

@@ -30,6 +30,8 @@ public:
 	void update(float delta);
 	void input(SDL_Event& event);
 
+	void restart();
+
 	void addOnKeyupFunction(std::function<void()> func);
 	void addOnMoveFunction(std::function<void()> func);
 	void addEveryKeyupFunction(std::function<void()> func);
@@ -85,10 +87,20 @@ private:
 
 class ButtonFactory 
 {
-public:
-	Button* create(std::string button_type, int x = 0, int y = 0, bool is_streaming = false);
-
 private:
+	ButtonFactory() = default;
+
+	ButtonFactory(const ButtonFactory&) = delete;
+	ButtonFactory& operator=(const ButtonFactory&) = delete;
+
+public:
+	static ButtonFactory* getInstance()
+	{
+		static ButtonFactory instance;
+		return &instance;
+	}
+
+	Button* create(std::string button_type, int x = 0, int y = 0, bool is_streaming = false);
 
 };
 
