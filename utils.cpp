@@ -1,11 +1,7 @@
 #include "utils.h"
 #include <algorithm>
 #include <SDL_mixer.h>
-
-extern int window_width;
-extern int window_height;
-
-extern SDL_Renderer* renderer;
+#include "dataManager.h"
 
 int setAllChannelsVolume(int volume, int per)
 {
@@ -25,7 +21,7 @@ void setFullScreen(SDL_Window* window, bool is_full)
 
     if (!is_full)
     {
-        SDL_SetWindowSize(window, window_width, window_height);
+        SDL_SetWindowSize(window, DataManager::getInstance()->window_width, DataManager::getInstance()->window_height);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     }
 }

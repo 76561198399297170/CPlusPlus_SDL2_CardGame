@@ -10,9 +10,15 @@
 class SceneManager : public Singleton<SceneManager>
 {
 	friend class Singleton<SceneManager>;
+private:
+	SceneManager() = default;
 
 public:
-	SceneManager() = default;
+	SceneManager(const SceneManager&) = delete;
+	SceneManager(SceneManager&&) = delete;
+	SceneManager operator=(const SceneManager&) = delete;
+	SceneManager operator=(const SceneManager&&) = delete;
+
 	~SceneManager() = default;
 
 	enum class SceneType
@@ -25,12 +31,10 @@ public:
 
 	void setScene(Scene* scene) { this->m_scene = scene; this->m_scene->enter(); }
 
-	void switchTo(SceneType switch_to, int sleep_time = 1, bool is_exit = true);
+	void switchTo(SceneType switch_to, int sleep_time = 0);
 
 	void update(float delta);
-
 	void render(SDL_Renderer* renderer, const Camera* camera);
-
 	void input(SDL_Event& event);
 
 private:

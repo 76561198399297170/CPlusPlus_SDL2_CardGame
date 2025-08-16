@@ -2,11 +2,7 @@
 
 #include <mutex>
 #include <ctime>
-
-extern int window_width;
-extern int window_height;
-
-extern bool is_shake;
+#include "dataManager.h"
 
 Camera::Camera(SDL_Renderer* renderer)
 {
@@ -72,12 +68,12 @@ void Camera::update(float delta)
 void Camera::render()
 {
 	float per = this->m_timer_light.getPercentage();
-	copyexRect(this->m_renderer, 0, 0, 0, std::abs((this->is_light ? 255 : 0) - (per / 100.0f) * 255), -50, -50, window_width + 50, window_height + 50);
+	copyexRect(this->m_renderer, 0, 0, 0, std::abs((this->is_light ? 255 : 0) - (per / 100.0f) * 255), -50, -50, DataManager::getInstance()->window_width + 50, DataManager::getInstance()->window_height + 50);
 }
 
 void Camera::shake(float duration, float strength)
 {
-	if (!is_shake) return;
+	if (!DataManager::getInstance()->is_shake) return;
 
 	this->m_shake_place = this->m_position;
 

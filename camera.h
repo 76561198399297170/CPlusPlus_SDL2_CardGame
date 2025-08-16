@@ -17,13 +17,14 @@ public:
 	void reset();
 
 	void update(float delta);
-
 	void render();
 
 	void shake(float duration, float strength = 15);
-
 	void turnLight(float duration);
-	
+
+	void setPosition(float x, float y) { this->m_position = Vector2{ x, y }; }
+	void movePosition(Vector2 pos) { this->m_position += pos; }
+
 	bool isStopShake() { return !this->is_shaking; }
 	bool isStopTurn() { return this->m_timer_light.isReached(); }
 

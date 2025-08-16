@@ -1,15 +1,13 @@
 #include "sceneManager.h"
+#include "dataManager.h"
 
-extern GameScene* game_scene;
-extern MenuScene* menu_scene;
-
-void SceneManager::switchTo(SceneType switch_to, int sleep_time, bool is_exit)
+void SceneManager::switchTo(SceneType switch_to, int sleep_time)
 {
+	this->m_scene->exit();
+
 	this->m_timer_sleep.reset();
 	this->m_timer_sleep.setDuration(sleep_time);
 	this->m_timer_sleep.start();
-
-	if (is_exit) this->m_scene->exit();
 
 	this->m_switch_to = switch_to;
 }
@@ -25,10 +23,10 @@ void SceneManager::update(float delta)
 		switch (this->m_switch_to)
 		{
 		case SceneType::Menu:
-			this->m_scene = menu_scene->getInstance();
+			this->m_scene = DataManager::getInstance()->menu_scene->getInstance();
 			break;
 		case SceneType::Game:
-			this->m_scene = game_scene->getInstance();
+			this->m_scene = DataManager::getInstance()->game_scene->getInstance();
 			break;
 		default:
 			break;

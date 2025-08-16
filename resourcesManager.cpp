@@ -2,8 +2,7 @@
 
 #include <SDL_image.h>
 #include <filesystem>
-
-extern int font_size;
+#include "dataManager.h"
 
 void ResourcesManager::loadResources(SDL_Renderer* renderer)
 {
@@ -47,7 +46,7 @@ void ResourcesManager::loadResources(SDL_Renderer* renderer)
 			}
 			else if (path.extension() == ".ttf")
 			{
-				TTF_Font* font = TTF_OpenFont(path.u8string().c_str(), font_size);
+				TTF_Font* font = TTF_OpenFont(path.u8string().c_str(), DataManager::getInstance()->font_size);
 
 				this->m_ttffont_pool[path.stem().u8string()] = font;
 			}

@@ -11,8 +11,15 @@
 class MenuScene : public Scene, public Singleton<MenuScene>
 {
 	friend class Singleton<MenuScene>;
-public:
+private:
 	MenuScene();
+
+public:
+	MenuScene(const MenuScene&) = delete;
+	MenuScene(MenuScene&&) = delete;
+	MenuScene operator=(const MenuScene&) = delete;
+	MenuScene operator=(const MenuScene&&) = delete;
+
 	~MenuScene() = default;
 
 	virtual void enter();

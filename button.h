@@ -100,7 +100,7 @@ public:
 		return &instance;
 	}
 
-	Button* create(std::string button_type, int x = 0, int y = 0, bool is_streaming = false);
+	Button* create(std::string button_type, int x = 0, int y = 0);
 
 };
 

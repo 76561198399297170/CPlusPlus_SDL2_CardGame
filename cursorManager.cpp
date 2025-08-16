@@ -1,6 +1,6 @@
 #include "cursorManager.h"
 #include "resourcesManager.h"
-
+#include "dataManager.h"
 #include <iostream>
 
 CursorManager::CursorManager()
@@ -39,15 +39,15 @@ void CursorManager::input(const SDL_Event& event)
 {
 	switch (event.type)
 	{
-	case SDL_MOUSEMOTION: 
+	case SDL_MOUSEMOTION://鼠标移动
 	{
 		this->m_position_previous.x = this->m_position_current.x, this->m_position_previous.y = this->m_position_current.y;
 		this->m_position_current.x = event.motion.x, this->m_position_current.y = event.motion.y;
 	}
 	break;
-	case SDL_MOUSEBUTTONDOWN:
+	case SDL_MOUSEBUTTONDOWN://鼠标按下
 	{
-		if (event.button.button == SDL_BUTTON_LEFT)
+		if (event.button.button == SDL_BUTTON_LEFT)//左键
 		{
 			this->is_left_down = true;
 			this->m_current = MouseType::CLICK;
@@ -61,9 +61,9 @@ void CursorManager::input(const SDL_Event& event)
 		}
 	}
 	break;
-	case SDL_MOUSEBUTTONUP:
+	case SDL_MOUSEBUTTONUP://鼠标抬起
 	{
-		if (event.button.button == SDL_BUTTON_LEFT)
+		if (event.button.button == SDL_BUTTON_LEFT)//左键
 		{
 			this->is_left_down = false;
 			this->m_current = MouseType::HOVER;

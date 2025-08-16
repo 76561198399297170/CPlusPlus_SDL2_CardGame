@@ -1,9 +1,5 @@
 #include "controlsTable.h"
-
-extern int window_width;
-extern int window_height;
-
-extern bool is_shake;
+#include "dataManager.h"
 
 ControlsTable::ControlsTable()
 {
@@ -23,7 +19,7 @@ ControlsTable::ControlsTable()
 
 	SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("music_table"), nullptr, nullptr, &w, &h);
 	w /= 3;
-	this->m_ani_background->setDstFRect({ (window_width - w) / 2.0f, (window_height - h) / 2.0f, (float)w, (float)h });
+	this->m_ani_background->setDstFRect({ (DataManager::getInstance()->window_width - w) / 2.0f, (DataManager::getInstance()->window_height - h) / 2.0f, (float)w, (float)h });
 	this->m_ani_background->setPlayMode(Animation::PlayMode::LOOP);
 	this->m_ani_background->addFramesFromSheetResource("music_table", 3, 60, false);
 	this->m_ani_background->play();
@@ -83,5 +79,5 @@ bool ControlsTable::input(SDL_Event& event)
 
 void ControlsTable::reload()
 {
-	this->m_btn_shake_check_box->is_show = is_shake;
+	this->m_btn_shake_check_box->is_show = DataManager::getInstance()->is_shake;
 }

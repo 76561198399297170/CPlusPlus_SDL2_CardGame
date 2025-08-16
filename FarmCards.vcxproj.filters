@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\Animation">
-      <UniqueIdentifier>{a4b4f363-c76a-4857-8ac7-d722897e6c4f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\source">
       <UniqueIdentifier>{8a160a8b-bff3-454b-af49-b82b9d9e93ec}</UniqueIdentifier>
     </Filter>
@@ -30,6 +27,12 @@
     </Filter>
     <Filter Include="头文件\table">
       <UniqueIdentifier>{9473068f-6c91-42f2-9576-a618be985bfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\mainGame">
+      <UniqueIdentifier>{8457252f-a197-4dd3-9e48-18f628639620}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\animation">
+      <UniqueIdentifier>{a4b4f363-c76a-4857-8ac7-d722897e6c4f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -84,13 +87,19 @@
     <ClCompile Include="gameTable.cpp">
       <Filter>源文件\source</Filter>
     </ClCompile>
-    <ClCompile Include="settingsManager.cpp">
+    <ClCompile Include="game.cpp">
+      <Filter>源文件\source</Filter>
+    </ClCompile>
+    <ClCompile Include="gamePlayer.cpp">
+      <Filter>源文件\source</Filter>
+    </ClCompile>
+    <ClCompile Include="gameMap.cpp">
       <Filter>源文件\source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation.h">
-      <Filter>头文件\Animation</Filter>
+      <Filter>头文件\animation</Filter>
     </ClInclude>
     <ClInclude Include="singleton.h">
       <Filter>头文件\utils</Filter>
@@ -143,11 +152,20 @@
     <ClInclude Include="videoTable.h">
       <Filter>头文件\table</Filter>
     </ClInclude>
-    <ClInclude Include="gameTable.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="dataManager.h">
+      <Filter>头文件\manager</Filter>
     </ClInclude>
-    <ClInclude Include="settingsManager.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="gameTable.h">
+      <Filter>头文件\table</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>头文件\mainGame</Filter>
+    </ClInclude>
+    <ClInclude Include="gamePlayer.h">
+      <Filter>头文件\mainGame</Filter>
+    </ClInclude>
+    <ClInclude Include="gameMap.h">
+      <Filter>头文件\mainGame</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

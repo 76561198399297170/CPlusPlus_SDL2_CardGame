@@ -1,11 +1,5 @@
 #include "videoTable.h"
-
-extern int window_width;
-extern int window_height;
-
-extern bool is_full_screen;
-extern bool is_vsync;
-extern bool is_vsync_change;
+#include "dataManager.h"
 
 VideoTable::VideoTable()
 {
@@ -24,19 +18,19 @@ VideoTable::VideoTable()
 			this->close();
 		});
 
-	this->m_ani_icon_tips->is_show = is_vsync_change;
+	this->m_ani_icon_tips->is_show = DataManager::getInstance()->is_vsync_change;
 	this->m_btn_vsync_check_box = ButtonFactory::getInstance()->create("Set_Vsync_Check_Box", 800, 400);
 	this->m_btn_vsync_check_box->addOnKeyupFunction([this]()
 		{
 			//this->m_ani_icon_tips->is_show = !this->m_ani_icon_tips->is_show;
-			this->m_ani_icon_tips->is_show = is_vsync_change;
+			this->m_ani_icon_tips->is_show = DataManager::getInstance()->is_vsync_change;
 		});
 
 	int w, h;
 
 	SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("music_table"), nullptr, nullptr, &w, &h);
 	w /= 3;
-	this->m_ani_background->setDstFRect({ (window_width - w) / 2.0f, (window_height - h) / 2.0f, (float)w, (float)h });
+	this->m_ani_background->setDstFRect({ (DataManager::getInstance()->window_width - w) / 2.0f, (DataManager::getInstance()->window_height - h) / 2.0f, (float)w, (float)h });
 	this->m_ani_background->setPlayMode(Animation::PlayMode::LOOP);
 	this->m_ani_background->addFramesFromSheetResource("music_table", 3, 60, false);
 	this->m_ani_background->play();
@@ -54,7 +48,7 @@ VideoTable::VideoTable()
 	this->m_ani_icon_vsync->play();
 
 	SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("setting_change_tips"), nullptr, nullptr, &w, &h);
-	this->m_ani_icon_tips->setDstFRect({ (window_width - w) / 2.0f, (window_height - h) / 2.0f, (float)w, (float)h });
+	this->m_ani_icon_tips->setDstFRect({ (DataManager::getInstance()->window_width - w) / 2.0f, (DataManager::getInstance()->window_height - h) / 2.0f, (float)w, (float)h });
 	this->m_ani_icon_tips->setPlayMode(Animation::PlayMode::LOOP);
 	this->m_ani_icon_tips->addFramesFromSheetResource("setting_change_tips", 1, 1, false);
 	this->m_ani_icon_tips->is_show = false;
@@ -126,8 +120,8 @@ bool VideoTable::input(SDL_Event& event)
 
 void VideoTable::reload()
 {
-	this->m_btn_screen_check_box->is_show = is_full_screen;
-	this->m_btn_vsync_check_box->is_show = is_vsync;
+	this->m_btn_screen_check_box->is_show = DataManager::getInstance()->is_full_screen;
+	this->m_btn_vsync_check_box->is_show = DataManager::getInstance()->is_vsync;
 
-	this->m_ani_icon_tips->is_show = is_vsync_change;
+	this->m_ani_icon_tips->is_show = DataManager::getInstance()->is_vsync_change;
 }

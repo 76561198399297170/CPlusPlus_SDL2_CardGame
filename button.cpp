@@ -3,17 +3,9 @@
 #include "cursorManager.h"
 #include "sceneManager.h"
 #include "utils.h"
+#include "dataManager.h"
 
-extern SDL_Window* window;
-extern Camera* main_camera;
-
-extern bool is_quit;
-extern bool is_full_screen;
-extern bool is_vsync;
-extern bool is_shake;
-extern bool is_vsync_change;
-
-Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_streaming)
+Button* ButtonFactory::create(std::string button_type, int x, int y)
 {
 	Button* button = new Button();
 	if (button_type == "Menu_Start")
@@ -120,7 +112,7 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			{
 				button->m_tex_keydown->reset();
 				button->m_tex_float->play();
-				is_quit = true;
+				DataManager::getInstance()->is_quit = true;
 			});
 		button->m_tex_normal->play();
 	}
@@ -312,7 +304,7 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
-		button->is_show = is_full_screen;
+		button->is_show = DataManager::getInstance()->is_full_screen;
 
 		button->setTextureSheet("check_box_t", "check_box_t", "check_box_t", 3, 3, 3, 60, 60, 60);
 		button->setOnFloatFunction([button]()
@@ -321,8 +313,8 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			});
 		button->setOnKeyupFunction([button]()
 			{
-				is_full_screen = !is_full_screen;
-				setFullScreen(window, is_full_screen);
+				DataManager::getInstance()->is_full_screen = !DataManager::getInstance()->is_full_screen;
+				setFullScreen(DataManager::getInstance()->window, DataManager::getInstance()->is_full_screen);
 				button->is_show = !button->is_show;
 			});
 		button->m_tex_normal->play();
@@ -337,7 +329,7 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
-		button->is_show = (is_vsync && !is_vsync_change);
+		button->is_show = (DataManager::getInstance()->is_vsync && !DataManager::getInstance()->is_vsync_change);
 
 		button->setTextureSheet("check_box_t", "check_box_t", "check_box_t", 3, 3, 3, 60, 60, 60);
 		button->setOnFloatFunction([button]()
@@ -346,8 +338,8 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			});
 		button->setOnKeyupFunction([button]()
 			{
-				is_vsync = !is_vsync;
-				is_vsync_change = !is_vsync_change;
+				DataManager::getInstance()->is_vsync = !DataManager::getInstance()->is_vsync;
+				DataManager::getInstance()->is_vsync_change = !DataManager::getInstance()->is_vsync_change;
 				button->is_show = !button->is_show;
 			});
 		button->m_tex_normal->play();
@@ -362,7 +354,7 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 		button->m_rect_center = { w / 2.0f, h / 2.0f };
 		button->m_rect_dst = { (float)x, (float)y, (float)w, (float)h };
 		button->m_rect_src = { 0, 0, w, h };
-		button->is_show = is_shake;
+		button->is_show = DataManager::getInstance()->is_shake;
 
 		button->setTextureSheet("check_box_t", "check_box_t", "check_box_t", 3, 3, 3, 60, 60, 60);
 		button->setOnFloatFunction([button]()
@@ -371,7 +363,7 @@ Button* ButtonFactory::create(std::string button_type, int x, int y, bool is_str
 			});
 		button->setOnKeyupFunction([button]()
 			{
-				is_shake = !is_shake;
+				DataManager::getInstance()->is_shake = !DataManager::getInstance()->is_shake;
 				button->is_show = !button->is_show;
 			});
 		button->m_tex_normal->play();
@@ -485,7 +477,7 @@ void Button::update(float delta)
 void Button::input(SDL_Event& event)
 {
 	int x, y;
-	if (event.type == SDL_MOUSEMOTION) x = event.motion.x, y = event.motion.y;
+	if (event.type == SDL_MOUSEMOTION) x = CursorManager::getInstance()->getPosCurr().x, y = CursorManager::getInstance()->getPosCurr().y;
 	else x = event.button.x, y = event.button.y;
 	bool is_onbutton = (this->is_streaming ? this->isOnButton_ex(Vector2{ (float)x, (float)y }) : this->isOnButton(Vector2{ (float)x, (float)y }));
 

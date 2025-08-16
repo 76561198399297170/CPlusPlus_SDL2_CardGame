@@ -9,9 +9,15 @@
 class CursorManager : public Singleton<CursorManager>
 {
 	friend class Singleton<CursorManager>;
+private:
+	CursorManager();
 
 public:
-	CursorManager();
+	CursorManager(const CursorManager&) = delete;
+	CursorManager(CursorManager&&) = delete;
+	CursorManager operator=(const CursorManager&) = delete;
+	CursorManager operator=(const CursorManager&&) = delete;
+
 	~CursorManager();
 
 	enum class MouseType

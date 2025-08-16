@@ -10,16 +10,20 @@
 #include "singleton.h"
 
 
-
 class ResourcesManager : public Singleton<ResourcesManager>
 {
 	friend class Singleton<ResourcesManager>;
+private:
+	ResourcesManager() = default;
 
 public:
-	ResourcesManager() = default;
+	ResourcesManager(const ResourcesManager&) = delete;
+	ResourcesManager(ResourcesManager&&) = delete;
+	ResourcesManager operator=(const ResourcesManager&) = delete;
+	ResourcesManager operator=(const ResourcesManager&&) = delete;
+
 	~ResourcesManager() = default;
 
-public:
 	void loadResources(SDL_Renderer* renderer);
 
 	Mix_Chunk* queryAudio(const std::string& name);

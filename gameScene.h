@@ -4,13 +4,21 @@
 #include "scene.h"
 #include "singleton.h"
 #include "gameTable.h"
+#include "game.h"
 
 
 class GameScene : public Scene, public Singleton<GameScene>
 {
 	friend class Singleton<GameScene>;
-public:
+private:
 	GameScene();
+
+public:
+	GameScene(const GameScene&) = delete;
+	GameScene(GameScene&&) = delete;
+	GameScene operator=(const GameScene&) = delete;
+	GameScene operator=(const GameScene&&) = delete;
+
 	~GameScene() = default;
 
 	virtual void enter();
@@ -21,6 +29,8 @@ public:
 	virtual void input(SDL_Event& event);
 
 private:
+	Game* m_main_game;
+
 	Button* m_btn_setting;
 
 	GameTable* m_tab_setting;

@@ -1,8 +1,6 @@
 #include "gameTable.h"
 #include "sceneManager.h"
-
-extern int window_width;
-extern int window_height;
+#include "dataManager.h"
 
 GameTable::GameTable()
 {
@@ -35,7 +33,7 @@ GameTable::GameTable()
 
 	SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("setting_table"), nullptr, nullptr, &w, &h);
 	w /= 3;
-	this->m_ani_background->setDstFRect({ (window_width - w) / 2.0f, (window_height - h) / 2.0f, (float)w, (float)h });
+	this->m_ani_background->setDstFRect({ (DataManager::getInstance()->window_width - w) / 2.0f, (DataManager::getInstance()->window_height - h) / 2.0f, (float)w, (float)h });
 	this->m_ani_background->setPlayMode(Animation::PlayMode::LOOP);
 	this->m_ani_background->addFramesFromSheetResource("setting_table", 3, 60, false);
 	this->m_ani_background->play();

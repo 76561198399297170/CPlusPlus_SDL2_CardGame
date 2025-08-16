@@ -2,9 +2,7 @@
 #include "resourcesManager.h"
 #include "cursorManager.h"
 #include "utils.h"
-
-extern int window_width;
-extern int window_height;
+#include "dataManager.h"
 
 VolumeTable::VolumeTable()
 {
@@ -24,7 +22,7 @@ VolumeTable::VolumeTable()
 
 	SDL_QueryTexture(ResourcesManager::getInstance()->queryTexture("music_table"), nullptr, nullptr, &w, &h);
 	w /= 3;
-	this->m_ani_background->setDstFRect({ (window_width - w) / 2.0f, (window_height - h) / 2.0f, (float)w, (float)h });
+	this->m_ani_background->setDstFRect({ (DataManager::getInstance()->window_width - w) / 2.0f, (DataManager::getInstance()->window_height - h) / 2.0f, (float)w, (float)h });
 	this->m_ani_background->setPlayMode(Animation::PlayMode::LOOP);
 	this->m_ani_background->addFramesFromSheetResource("music_table", 3, 60, false);
 	this->m_ani_background->play();

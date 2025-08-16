@@ -11,65 +11,36 @@
 #include <windows.h>
 
 #include "button.h"
-
 #include "resourcesManager.h"
-#include "cursorManager.h"
-#include "sceneManager.h"
-
-#include "camera.h"
+#include "dataManager.h"
 #include "utils.h"
-#include <iostream>
 
 
 #define u8(x) u8##x
-
-
-bool is_quit = false;
-bool is_shake = true;
-bool is_full_screen = false;
-bool is_vsync = true;
-bool is_vsync_change = false;
-
-int fps = 60;
-int font_size = 24;
-
-int window_width = 1280;
-int window_height = 720;
-
-SDL_Window* window = nullptr;
-SDL_Renderer* renderer = nullptr;
-
-Camera* main_camera = nullptr;
-
-GameScene* game_scene = nullptr;
-MenuScene* menu_scene = nullptr;
-
-ResourcesManager* res_mgr = nullptr;
-CursorManager* cur_mgr = nullptr;
-SceneManager* scn_mgr = nullptr;
 
 bool load_resources()
 {
     std::ifstream file("./resources/setting.json");
     Json::CharReaderBuilder reader;
     Json::Value root;
+
     std::string errors;
     bool parseSuccess = Json::parseFromStream(reader, file, &root, &errors);
     if (!parseSuccess) return true;
 
-    window_width = root["video"]["width"].asInt();
-    window_height = root["video"]["height"].asInt();
+    DataManager::getInstance()->is_shake = root["controls"]["vibration"].asBool();
 
-    is_shake = root["controls"]["vibration"].asBool();
-    setAllChannelsVolume(root["volume"]["music"].asInt());
-
-    is_vsync = root["video"]["vsync"].asBool();
-
+    DataManager::getInstance()->window_width = root["video"]["width"].asInt();
+    DataManager::getInstance()->window_height = root["video"]["height"].asInt();
+    DataManager::getInstance()->is_vsync = root["video"]["vsync"].asBool();
     if (root["video"]["fullscreen"].asBool())
     {
-        is_full_screen = true;
-        setFullScreen(window, true);
+        DataManager::getInstance()->is_full_screen = true;
+        setFullScreen(DataManager::getInstance()->window, true);
     }
+
+    setAllChannelsVolume(root["volume"]["music"].asInt());
+    file.close();
 
     return false;
 }
@@ -94,30 +65,30 @@ bool init()
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
     Mix_AllocateChannels(32);
 
-    window = SDL_CreateWindow(u8("你好，世界"), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_SHOWN);
+    DataManager::getInstance()->window = SDL_CreateWindow(u8("你好，世界"), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DataManager::getInstance()->window_width, DataManager::getInstance()->window_height, SDL_WINDOW_SHOWN);
 
     if (load_resources()) return true;
 
     Uint32 flag = SDL_RENDERER_ACCELERATED;
-    if (is_vsync) flag |= SDL_RENDERER_PRESENTVSYNC;
-    renderer = SDL_CreateRenderer(window, -1, flag);
+    if (DataManager::getInstance()->is_vsync) flag |= SDL_RENDERER_PRESENTVSYNC;
+    DataManager::getInstance()->renderer = SDL_CreateRenderer(DataManager::getInstance()->window, -1, flag);
 
-    if (!renderer) return true;
+    if (!DataManager::getInstance()->renderer) return true;
 
     SDL_ShowCursor(SDL_DISABLE);
     
-    res_mgr = ResourcesManager::getInstance();
-    res_mgr->getInstance()->loadResources(renderer);
+    DataManager::getInstance()->res_mgr = ResourcesManager::getInstance();
+    DataManager::getInstance()->res_mgr->getInstance()->loadResources(DataManager::getInstance()->renderer);
 
-    menu_scene = MenuScene::getInstance();
-    game_scene = GameScene::getInstance();
+    DataManager::getInstance()->menu_scene = MenuScene::getInstance();
+    DataManager::getInstance()->game_scene = GameScene::getInstance();
 
-    main_camera = new Camera(renderer);
+    DataManager::getInstance()->main_camera = new Camera(DataManager::getInstance()->renderer);
 
-    cur_mgr = CursorManager::getInstance();
+    DataManager::getInstance()->cur_mgr = CursorManager::getInstance();
 
-    scn_mgr = SceneManager::getInstance();
-    scn_mgr->getInstance()->setScene(menu_scene);
+    DataManager::getInstance()->scn_mgr = SceneManager::getInstance();
+    DataManager::getInstance()->scn_mgr->getInstance()->setScene(DataManager::getInstance()->menu_scene);
 
     return false;
 }
@@ -126,12 +97,12 @@ void deinit()
 {
     delete_resources();
 
-    delete cur_mgr;
-    delete res_mgr;
-    delete main_camera;
+    delete DataManager::getInstance()->cur_mgr;
+    delete DataManager::getInstance()->res_mgr;
+    delete DataManager::getInstance()->main_camera;
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(DataManager::getInstance()->renderer);
+    SDL_DestroyWindow(DataManager::getInstance()->window);
 
     TTF_Quit();
     Mix_Quit();
@@ -164,46 +135,46 @@ void mainloop()
         {
             if (event.type == SDL_QUIT)
             {
-                is_quit = true;
+                DataManager::getInstance()->is_quit = true;
             }
             else if (event.type == SDL_KEYDOWN)
             {
-                if (event.key.keysym.sym == SDLK_SPACE) main_camera->turnLight(3000);
+                if (event.key.keysym.sym == SDLK_SPACE) DataManager::getInstance()->main_camera->turnLight(3000);
             }
 
-            cur_mgr->getInstance()->input(event);
-            scn_mgr->getInstance()->input(event);
+            DataManager::getInstance()->cur_mgr->getInstance()->input(event);
+            DataManager::getInstance()->scn_mgr->getInstance()->input(event);
         }
         Uint64 current_counter = SDL_GetPerformanceCounter();
         double delta = (double)(current_counter - last_counter) / counter_freq;
         last_counter = current_counter;
-        if (is_quit) quit_timer.start();
+        if (DataManager::getInstance()->is_quit) quit_timer.start();
 
 
         //数据处理
-        if (is_quit) quit_timer.update((float)delta * 1000.0);
+        if (DataManager::getInstance()->is_quit) quit_timer.update((float)delta * 1000.0);
 
         quit_timer.update((float)delta * 1000.0);
-        main_camera->update((float)delta * 1000.0);
+        DataManager::getInstance()->main_camera->update((float)delta * 1000.0);
 
-        scn_mgr->getInstance()->update((float)delta * 1000.0);
+        DataManager::getInstance()->scn_mgr->getInstance()->update((float)delta * 1000.0);
 
 
         //渲染绘制
-        SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(DataManager::getInstance()->renderer);
+        SDL_SetRenderDrawColor(DataManager::getInstance()->renderer, 0, 0, 0, 255);
 
-        scn_mgr->getInstance()->render(renderer, main_camera);
-        main_camera->render();
-        cur_mgr->getInstance()->render(renderer);
+        DataManager::getInstance()->scn_mgr->getInstance()->render(DataManager::getInstance()->renderer, DataManager::getInstance()->main_camera);
+        DataManager::getInstance()->main_camera->render();
+        DataManager::getInstance()->cur_mgr->getInstance()->render(DataManager::getInstance()->renderer);
 
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(DataManager::getInstance()->renderer);
 
 
         //动态延时
-        if (delta * 1000.0 < 1000.0 / fps)
+        if (delta * 1000.0 < 1000.0 / DataManager::getInstance()->fps)
         {
-            SDL_Delay((Uint32)(1000.0 / fps - delta * 1000.0));
+            SDL_Delay((Uint32)(1000.0 / DataManager::getInstance()->fps - delta * 1000.0));
         }
     }
 }
@@ -219,15 +190,15 @@ void saveSetting()
 
     // 视频设置
     Json::Value videoSettings;
-    videoSettings["width"] = window_width;          //分辨率
-    videoSettings["height"] = window_height;        //分辨率
-    videoSettings["fullscreen"] = is_full_screen;   //是否全屏
-    videoSettings["vsync"] = is_vsync;              //垂直同步
+    videoSettings["width"] = DataManager::getInstance()->window_width;          //分辨率
+    videoSettings["height"] = DataManager::getInstance()->window_height;        //分辨率
+    videoSettings["fullscreen"] = DataManager::getInstance()->is_full_screen;   //是否全屏
+    videoSettings["vsync"] = DataManager::getInstance()->is_vsync;              //垂直同步
     root["video"] = videoSettings;
 
     // 控制设置
     Json::Value controlSettings;
-    controlSettings["vibration"] = is_shake;        //振动反馈
+    controlSettings["vibration"] = DataManager::getInstance()->is_shake;        //振动反馈
     root["controls"] = controlSettings;
 
     Json::StreamWriterBuilder writer;
@@ -244,7 +215,7 @@ BOOL WINAPI ConsoleHandler(DWORD event)
     case CTRL_SHUTDOWN_EVENT: // 系统关机
     case CTRL_CLOSE_EVENT:  // 捕获控制台窗口关闭事件
     case CTRL_C_EVENT:      // Ctrl+C事件
-    case CTRL_BREAK_EVENT:  // Ctrl+Break事件[
+    case CTRL_BREAK_EVENT:  // Ctrl+Break事件
         saveSetting();
         return TRUE;
     default:
@@ -254,6 +225,7 @@ BOOL WINAPI ConsoleHandler(DWORD event)
 
 int main(int argc, char** argv)
 {
+    DataManager::getInstance();
     if (!SetConsoleCtrlHandler(ConsoleHandler, TRUE)) return 1;
     if (init()) return 1;
 
