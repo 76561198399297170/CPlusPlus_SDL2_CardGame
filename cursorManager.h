@@ -2,7 +2,7 @@
 #define _CURSOR_MANAGER_H_
 
 #include <SDL.h>
-
+#include "vector2.h"
 #include "singleton.h"
 
 
@@ -38,13 +38,14 @@ public:
 	void switchType(MouseType type);
 
 	SDL_Point getPosCurr() { return this->m_position_current; }
-	Vector2 getVecCurr() { return Vector2{ this->m_position_current.x, this->m_position_current.y }; }
+	Vector2 getVecCurr() { return Vector2{ (float)this->m_position_current.x, (float)this->m_position_current.y }; }
 
 	SDL_Point getPosPre() { return this->m_position_previous; }
-	Vector2 getVecPre() { return Vector2{ this->m_position_previous.x, this->m_position_previous.y }; }
+	Vector2 getVecPre() { return Vector2{ (float)this->m_position_previous.x, (float)this->m_position_previous.y }; }
 
 	int getWheel() { return this->m_mid_wheel; }
 	bool isLeftKeyDown() { return this->is_left_down; }
+	bool isMiddleKeyDown() { return this->is_mid_down; }
 	bool isRightKeyDown() { return this->is_right_down; }
 	
 private:
@@ -57,6 +58,7 @@ private:
 
 	int m_mid_wheel = 0;
 	bool is_left_down = false;
+	bool is_mid_down = false;
 	bool is_right_down = false;
 };
 

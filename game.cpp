@@ -20,7 +20,7 @@ void Game::startGame(bool is_restart)
 
 		if (this->m_map->createNewGame() || this->m_palyer->createPlayer()) DataManager::getInstance()->is_quit = true;
 
-		this->m_game_camera->setPosition(this->m_map->getMapMid_x() / 2.0f, this->m_map->getMapMid_y() / 2.0f);
+		this->m_game_camera->setPosition((this->m_map->getMapMid_x() - DataManager::getInstance()->window_width) / 2.0f, (this->m_map->getMapMid_y() - DataManager::getInstance()->window_height) / 2.0f);
 
 		return;
 	}
@@ -186,14 +186,14 @@ void Game::input(SDL_Event& event)
 		break;
 	}
 	int wheel = CursorManager::getInstance()->getWheel();
-	if (this->is_ctrl && wheel != 0)
+	if ((this->is_ctrl || CursorManager::getInstance()->isMiddleKeyDown()) && wheel != 0)
 	{
 		float scale = this->m_map->getScale() + (wheel > 0 ? 1 : -1) * 0.01f;
 		scale = std::max(0.1f, std::min(0.5f, scale));
 
 
-		Vector2 center_pos = Vector2{ DataManager::getInstance()->window_width / 2.0f, DataManager::getInstance()->window_height / 2.0f } + this->m_game_camera->m_position;
-		center_pos = center_pos * scale / this->m_map->getScale() - Vector2{ DataManager::getInstance()->window_width / 2.0f, DataManager::getInstance()->window_height / 2.0f };
+		Vector2 center_pos = Vector2{ DataManager::getInstance()->window_width / 2.0f, DataManager::getInstance()->window_height / 2.0f } + this->m_game_camera->m_position - MapPlace().base;
+		center_pos = center_pos * scale / this->m_map->getScale() - Vector2{ DataManager::getInstance()->window_width / 2.0f, DataManager::getInstance()->window_height / 2.0f } + MapPlace().base;
 
 		this->m_game_camera->setPosition(center_pos);
 		
@@ -202,8 +202,7 @@ void Game::input(SDL_Event& event)
 
 	if (CursorManager::getInstance()->isRightKeyDown())
 	{
-		static Vector2 pos = CursorManager::getInstance()->getVecCurr();
-
+		this->m_game_camera->movePosition(CursorManager::getInstance()->getVecPre() - CursorManager::getInstance()->getVecCurr());
 	}
 
 	this->m_map->input(event);

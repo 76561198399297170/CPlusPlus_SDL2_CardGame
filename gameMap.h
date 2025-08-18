@@ -36,7 +36,7 @@ public:
 	void updateScaledPosition();
 
 public:
-	const Vector2 base{ 150, 150 };
+	const Vector2 base{ 150, 150 };//Áù±ßÐÎµØ¿é±ß³¤
 
 	int m_w, m_h;
 

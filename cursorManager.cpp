@@ -69,6 +69,10 @@ void CursorManager::input(const SDL_Event& event)
 			this->is_right_down = true;
 			this->m_current = (MouseType)(this->m_current + (!this->is_left_down));
 		}
+		else if (event.button.button == SDL_BUTTON_MIDDLE)
+		{
+			this->is_mid_down = true;
+		}
 	}
 	break;
 	case SDL_MOUSEBUTTONUP://Êó±êÌ§Æð
@@ -83,6 +87,10 @@ void CursorManager::input(const SDL_Event& event)
 			this->is_right_down = false;
 			this->m_current = (MouseType)(this->m_current - (!this->is_left_down));
 		}
+		else if (event.button.button == SDL_BUTTON_MIDDLE)
+		{
+			this->is_mid_down = false;
+		}
 	}
 	break;
 	case SDL_MOUSEWHEEL:
@@ -96,7 +104,9 @@ void CursorManager::input(const SDL_Event& event)
 	system("cls");
 	std::cout << "mouse: " << this->m_position_current.x << " " << this->m_position_current.y << "\n";
 	std::cout << "wheel: " << this->m_mid_wheel << "\n";
-	std::cout << "left key: " << (this->is_left_down ? "down" : "up  ") << "  " << "right key: " << (this->is_right_down ? "down" : "up  ") << "\n";
+	std::cout << "left key: " << (this->is_left_down ? "down" : "up  ") << "\n";
+	std::cout << "right key: " << (this->is_right_down ? "down" : "up  ") << "\n";
+	std::cout << "middle key: " << (this->is_mid_down ? "down" : "up") << "\n";
 }
 
 void CursorManager::switchType(MouseType type)
