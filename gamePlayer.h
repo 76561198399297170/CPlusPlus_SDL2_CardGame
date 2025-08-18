@@ -11,6 +11,9 @@ public:
 	~GamePlayer() = default;
 
 	void reload();
+	bool createPlayer();
+
+	bool savePlayerInf();
 
 	void update(float delta);
 	void render(SDL_Renderer* renderer, const Camera* camera);

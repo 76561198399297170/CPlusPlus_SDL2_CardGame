@@ -31,6 +31,8 @@ void GameScene::enter()
 
 void GameScene::exit()
 {
+	this->is_input = false;
+	this->m_main_game->saveGame();
 	DataManager::getInstance()->main_camera->turnLight(2000);
 }
 

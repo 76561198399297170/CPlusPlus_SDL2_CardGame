@@ -1,8 +1,9 @@
 #include "gameMap.h"
 #include "dataManager.h"
 #include "resourcesManager.h"
-#include <fstream>
 #include <json/json.h>
+#include <cmath>
+#include <iostream>
 
 MapPlace::MapPlace()
 {
@@ -14,6 +15,7 @@ MapPlace::MapPlace()
 
 void MapPlace::update(float delta)
 {
+    if (this->m_logic_x == 0 && this->m_logic_y == 0) std::cout << this->m_ani_place->getPosRect().x << "  " << this->m_ani_place->getPosRect().y << "\n";
     this->m_ani_place->update(delta);
 }
 
@@ -47,75 +49,75 @@ void MapPlace::reloadPlace()
     this->m_ani_place->play();
 }
 
+void MapPlace::applyScale(float scale)
+{
+    this->m_current_scale = scale;
+    this->m_ani_place->setScale(Vector2{ scale, scale });
+
+    this->updateScaledPosition();
+}
+
 void MapPlace::setMapIndex(int x, int y)
 {
+    this->m_logic_x = x, this->m_logic_y = y;
+    
+    float scaled_base_x = this->base.m_x * this->m_current_scale;
+    float scaled_base_y = this->base.m_y * this->m_current_scale;
+    float scaled_w = this->m_w * this->m_current_scale;
+    float scaled_h = this->m_h * this->m_current_scale;
+
+    float scaled_offset_225 = 225 * this->m_current_scale;
+    float scaled_offset_75 = 75 * this->m_current_scale;
+
     if (x & 1)
     {
-        x = (x - 1) / 2;
-        this->m_x = 225 + x * this->base.m_x + x * this->m_w;
-        this->m_y = y * this->m_h;
+        int adjusted_x = (x - 1) / 2;
+        this->m_x = scaled_offset_225 + adjusted_x * scaled_w + adjusted_x * scaled_base_x;
+        this->m_y = y * scaled_h;
     }
     else
     {
-        x /= 2;
-        this->m_x = x * this->base.m_x + x * this->m_w;
-        this->m_y = this->base.m_y + y * this->m_h;
+        int adjusted_x = x / 2;
+        this->m_x = adjusted_x * scaled_w + adjusted_x * scaled_base_x;
+        this->m_y = scaled_base_y + y * scaled_h;
     }
-
     this->m_ani_place->setDstFRect({ this->m_x, this->m_y, (float)this->m_w, (float)this->m_h });
 }
 
-/* ============================================================================================================== */
-/* ============================================================================================================== */
-/* ============================================================================================================== */
-
-GameMap::GameMap()
+void MapPlace::updateScaledPosition()
 {
-    if (this->loadMapInf())
-    {
-        //创建地图
-        if (this->saveMapInf())
-        {
-            //存储失败
-            return;
-        }
-        //存储成功
-        return;
-    }
-    //读取地图
-
-
+    setMapIndex(m_logic_x, m_logic_y);
 }
 
-bool GameMap::loadMapInf()
+/* ============================================================================================================== */
+/* ============================================================================================================== */
+/* ============================================================================================================== */
+
+bool GameMap::loadMapInf(Json::Value root_map)
 {
-    this->is_first_start = false;
+    //读取游戏信息
+    this->m_map_size = { (float)root_map["map"]["width"].asInt(), (float)root_map["map"]["height"].asInt() };
+    this->m_map_scale = root_map["map"]["origin"].asFloat();
+    
+    //读取地图信息
 
-    std::ifstream file("./save/save.json");
-    Json::CharReaderBuilder reader;
-    Json::Value root;
+    //读取玩家信息
 
-    std::string errors;
-    bool parseSuccess = Json::parseFromStream(reader, file, &root, &errors);
-    if (!parseSuccess || true)//==========tips==========
-    {
-        this->m_map_size = { 3, 5 };
-        if (this->createNewGame()) return true;
-        return false;
-    }
-    system("pause");
-    this->m_map_size = { (float)root["map"]["width"].asInt(), (float)root["map"]["height"].asInt() };
+
     return false;
 }
 
 bool GameMap::saveMapInf()
 {
-    return true;
+    //未编写，需补充暂时设定为存储正确
+    return false;
 }
 
 bool GameMap::createNewGame()
 {
+    this->m_map_size = { 30,15 };
     this->is_first_start = true;
+    this->m_map_scale = 0.16f;
 
     this->m_map = new MapPlace * [this->m_map_size.m_y];
     for (int y = 0; y < this->m_map_size.m_y; y++)
@@ -124,15 +126,17 @@ bool GameMap::createNewGame()
         for (int x = 0; x < this->m_map_size.m_x; x++)
         {
             this->m_map[y][x].setPlaceType(MapPlace::PlaceType::Grass);
+            this->m_map[y][x].applyScale(this->m_map_scale);
             this->m_map[y][x].setMapIndex(x, y);
         }
     }
 
-    return true;
+    return false;
 }
 
 void GameMap::update(float delta)
 {
+    std::cout << "scale: " << this->m_map_scale << "\n";
     for (int y = 0; y < this->m_map_size.m_y; y++)
     {
         for (int x = 0; x < this->m_map_size.m_x; x++)
@@ -161,6 +165,20 @@ void GameMap::input(SDL_Event& event)
         for (int x = 0; x < this->m_map_size.m_x; x++)
         {
             this->m_map[y][x].input(event);
+        }
+    }
+}
+
+void GameMap::setScale(float scale)
+{
+    if (this->m_map_scale == scale) return;
+
+    this->m_map_scale = scale;
+    for (int y = 0; y < m_map_size.m_y; y++)
+    {
+        for (int x = 0; x < m_map_size.m_x; x++)
+        {
+            m_map[y][x].applyScale(m_map_scale);
         }
     }
 }

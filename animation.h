@@ -47,26 +47,26 @@ public:
     void pause();
     void stop();
 
-    void setDstFRect(const SDL_FRect& rect);
-    void setPosition(float x, float y);
+    void setDstFRect(const SDL_FRect& rect) { this->m_dst_rect = rect; }
+    void setPosition(float x, float y) { this->m_dst_rect.x = x, this->m_dst_rect.y = y; }
     void setPosition(const Vector2 position);
     void setRotation(double angle);
     void setScale(const Vector2 scale);
-    void setOrigin(const Vector2 origin);
+    void setOrigin(const Vector2 origin) { this->m_origin = { (float)origin.m_x, (float)origin.m_y }; }
     void setPlayMode(PlayMode mode);
-    void setSpeed(float speedFactor);
+    void setSpeed(float speed_factor) { this->m_speed_factor = speed_factor; }
 
     void addFinishedAction(std::function<void()> action);
     void addFrameChangedAction(std::function<void()> action);
-    void resetFinishedAction();
-    void resetFrameChangedAction();
+    void resetFinishedAction() { this->on_finished = []() {}; }
+    void resetFrameChangedAction() { this->on_frame_changed = [](size_t t) {}; }
 
     bool isPlaying() const { return !this->m_paused && !this->m_stopped && !this->m_finished; }
     bool isPaused() const { return this->m_paused; }
     bool isStopped() const { return this->m_stopped; }
     bool isFinished() const { return this->m_finished; }
     SDL_Rect getCurrRect() const;
-    SDL_FRect getPosRect() const;
+    SDL_FRect getPosRect() const { return this->m_dst_rect; }
     SDL_Texture* getCurrentTexture() const { return this->m_frames[this->m_frame_index].texture; }
 
 private:

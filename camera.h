@@ -22,8 +22,10 @@ public:
 	void shake(float duration, float strength = 15);
 	void turnLight(float duration);
 
+	void setPosition(Vector2 pos) { this->m_position = pos; }
 	void setPosition(float x, float y) { this->m_position = Vector2{ x, y }; }
 	void movePosition(Vector2 pos) { this->m_position += pos; }
+	void movePosition(float x, float y) { this->m_position.m_x += x, this->m_position.m_y += y; }
 
 	bool isStopShake() { return !this->is_shaking; }
 	bool isStopTurn() { return this->m_timer_light.isReached(); }

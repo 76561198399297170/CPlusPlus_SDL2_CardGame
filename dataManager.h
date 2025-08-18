@@ -51,7 +51,7 @@ public:
 	int window_width = 1280;//屏幕宽
 	int window_height = 720;//屏幕高
 
-	int game_camera_move_speed = 5;//游戏中主摄像头移动速度
+	int game_camera_move_speed = 8;//游戏中主摄像头移动速度
 };
 
 #endif

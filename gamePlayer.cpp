@@ -5,6 +5,16 @@ void GamePlayer::reload()
 
 }
 
+bool GamePlayer::createPlayer()
+{
+	return false;
+}
+
+bool GamePlayer::savePlayerInf()
+{
+	return false;
+}
+
 void GamePlayer::update(float delta)
 {
 

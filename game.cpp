@@ -1,6 +1,7 @@
 #include "game.h"
 #include <cmath>
 #include "dataManager.h"
+#include <fstream>
 #include <iostream>
 
 Game::Game()
@@ -11,11 +12,42 @@ Game::Game()
 	this->m_palyer = new GamePlayer();
 }
 
-void Game::startGame()
+void Game::startGame(bool is_restart)
 {
-	this->m_game_camera->setPosition(0, 0);
+	if (is_restart)
+	{
+		this->m_game_camera = new Camera(DataManager::getInstance()->renderer);
+
+		if (this->m_map->createNewGame() || this->m_palyer->createPlayer()) DataManager::getInstance()->is_quit = true;
+
+		this->m_game_camera->setPosition(this->m_map->getMapMid_x() / 2.0f, this->m_map->getMapMid_y() / 2.0f);
+
+		return;
+	}
+	std::string errors;
+	Json::Value root_map;
+
+	std::ifstream file("./save/map.json");
+	if (!file.is_open())
+	{
+		this->startGame(true);
+		return;
+	}
+
+	Json::CharReaderBuilder reader;
+	if (!Json::parseFromStream(reader, file, &root_map, &errors) || true)//暂时设置强制断开，避免加载数据而使用创建方法
+	{
+		this->startGame(true);
+		return;
+	}
+
+	//不应该触发
+	system("pause");
+
+	this->m_game_camera->setPosition(root_map["camera"]["x"].asFloat(), root_map["camera"]["y"].asFloat());
+
+	this->m_map->loadMapInf(root_map);
 	this->m_palyer->reload();
-	this->m_map->loadMapInf();
 }
 
 void Game::moveCamera()
@@ -30,18 +62,20 @@ void Game::moveCamera()
 		float normalized_x = dir_x / dir_len;
 		float normalized_y = dir_y / dir_len;
 
-		move_pos.m_x = (int)(DataManager::getInstance()->game_camera_move_speed * normalized_x);
-		move_pos.m_y = (int)(DataManager::getInstance()->game_camera_move_speed * normalized_y);
+		move_pos.m_x = (float)(DataManager::getInstance()->game_camera_move_speed * normalized_x);
+		move_pos.m_y = (float)(DataManager::getInstance()->game_camera_move_speed * normalized_y);
 	}
-	std::cout << "move: " << move_pos.m_x << ", " << move_pos.m_y << "\n";
 
 	this->m_game_camera->movePosition(move_pos);
 }
 
+bool Game::saveGame()
+{
+	return this->m_map->saveMapInf() && this->m_palyer->savePlayerInf();
+}
+
 void Game::clearKey()
 {
-	this->m_wheel = 0;
-
 	this->is_ctrl = false;
 
 	this->is_up = false;
@@ -66,7 +100,6 @@ void Game::render(SDL_Renderer* renderer, const Camera* camera)
 
 void Game::input(SDL_Event& event)
 {
-	this->m_wheel = 0;
 	SDL_Scancode scancode = event.key.keysym.scancode;
 
 	switch (event.type)
@@ -142,7 +175,6 @@ void Game::input(SDL_Event& event)
 		case SDL_SCANCODE_RCTRL:
 		{
 			this->is_ctrl = false;
-			this->m_wheel = 0;
 		}
 			break;
 		default:
@@ -150,16 +182,28 @@ void Game::input(SDL_Event& event)
 		}
 	}
 	break;
-	case SDL_MOUSEWHEEL:
-	{
-		if (this->is_ctrl)
-		{
-			this->m_wheel = event.wheel.y;
-		}
-	}
-	break;
 	default:
 		break;
+	}
+	int wheel = CursorManager::getInstance()->getWheel();
+	if (this->is_ctrl && wheel != 0)
+	{
+		float scale = this->m_map->getScale() + (wheel > 0 ? 1 : -1) * 0.01f;
+		scale = std::max(0.1f, std::min(0.5f, scale));
+
+
+		Vector2 center_pos = Vector2{ DataManager::getInstance()->window_width / 2.0f, DataManager::getInstance()->window_height / 2.0f } + this->m_game_camera->m_position;
+		center_pos = center_pos * scale / this->m_map->getScale() - Vector2{ DataManager::getInstance()->window_width / 2.0f, DataManager::getInstance()->window_height / 2.0f };
+
+		this->m_game_camera->setPosition(center_pos);
+		
+		this->m_map->setScale(scale);
+	}
+
+	if (CursorManager::getInstance()->isRightKeyDown())
+	{
+		static Vector2 pos = CursorManager::getInstance()->getVecCurr();
+
 	}
 
 	this->m_map->input(event);

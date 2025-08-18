@@ -152,17 +152,6 @@ void Animation::stop()
     this->m_frame_timer.reset();
 }
 
-void Animation::setDstFRect(const SDL_FRect& rect)
-{
-    this->m_dst_rect = rect;
-}
-
-void Animation::setPosition(float x, float y)
-{
-    this->m_dst_rect.x = x;
-    this->m_dst_rect.y = y;
-}
-
 void Animation::setPosition(const Vector2 position)
 {
     this->m_dst_rect.x = position.m_x;
@@ -181,11 +170,6 @@ void Animation::setRotation(double angle)
 void Animation::setScale(const Vector2 scale)
 {
     this->m_scale = { std::max(0.001f, scale.m_x), std::max(0.001f, scale.m_y) };
-}
-
-void Animation::setOrigin(const Vector2 origin)
-{
-    this->m_origin = { (float)origin.m_x, (float)origin.m_y };
 }
 
 void Animation::setPlayMode(PlayMode mode)
@@ -220,11 +204,6 @@ void Animation::setPlayMode(PlayMode mode)
     this->m_play_mode = mode;
 }
 
-void Animation::setSpeed(float speed_factor)
-{
-    this->m_speed_factor = speed_factor;
-}
-
 void Animation::addFinishedAction(std::function<void()> action)
 {
     std::function<void()> old_action = this->on_finished;
@@ -245,26 +224,11 @@ void Animation::addFrameChangedAction(std::function<void()> action)
         };
 }
 
-void Animation::resetFinishedAction()
-{
-    this->on_finished = []() { };
-}
-
-void Animation::resetFrameChangedAction()
-{
-    this->on_frame_changed = [](size_t t) {};
-}
-
 SDL_Rect Animation::getCurrRect() const
 {
     if (this->m_frames.empty()) return { 0,0,0,0 };
 
     return this->m_frames[this->m_frame_index].src_rect;
-}
-
-SDL_FRect Animation::getPosRect() const
-{
-    return this->m_dst_rect;
 }
 
 void Animation::calculateNextIndex()

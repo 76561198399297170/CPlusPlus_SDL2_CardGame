@@ -15,10 +15,6 @@ MenuScene::MenuScene()
     this->m_bk_plc = new Animation();
 
     this->m_btn_start = ButtonFactory::getInstance()->create("Menu_Start", 100, 100);
-    this->m_btn_start->addOnKeyupFunction([this]()
-        {
-            this->is_input = false;
-        });
 
     this->m_btn_setting = ButtonFactory::getInstance()->create("Menu_Setting", 100, 300);
     this->m_btn_setting->addOnKeyupFunction([this]()
@@ -84,6 +80,7 @@ void MenuScene::enter()
 
 void MenuScene::exit()
 {
+    this->is_input = false;
     if (this->m_music_cannel != -1)
     {
         Mix_FadeOutChannel(this->m_music_cannel, 2500);

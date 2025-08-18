@@ -131,6 +131,7 @@ void mainloop()
     while (!main_loop)
     {
         //事件处理
+        DataManager::getInstance()->cur_mgr->resetWheel();
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
@@ -156,7 +157,7 @@ void mainloop()
 
         quit_timer.update((float)delta * 1000.0);
         DataManager::getInstance()->main_camera->update((float)delta * 1000.0);
-
+        DataManager::getInstance()->cur_mgr->update((float)delta * 1000.0);
         DataManager::getInstance()->scn_mgr->getInstance()->update((float)delta * 1000.0);
 
 

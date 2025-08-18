@@ -22,8 +22,10 @@ public:
 
 	~Game() = default;
 
-	void startGame();
+	void startGame(bool is_restart = false);
 	void moveCamera();
+
+	bool saveGame();
 
 	void clearKey();
 
@@ -37,8 +39,6 @@ private:
 
 private:
 	Camera* m_game_camera;
-
-	int m_wheel = 0;
 
 	bool is_ctrl = false;
 
